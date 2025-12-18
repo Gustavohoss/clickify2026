@@ -6,12 +6,16 @@ import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Loader2, AlertCircle} from 'lucide-react';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {searchAgent} from '@/ai/flows/search-agent';
+
+type Resultado = {
+  nome: string;
+  info: string;
+};
 
 export default function Home() {
   const [cidade, setCidade] = useState('');
   const [busca, setBusca] = useState('');
-  const [resultados, setResultados] = useState<any[]>([]);
+  const [resultados, setResultados] = useState<Resultado[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +25,17 @@ export default function Home() {
     setError(null);
 
     try {
-      const result = await searchAgent({busca, cidade});
+      const response = await fetch(
+        `/api/scraper?busca=${encodeURIComponent(busca)}&cidade=${encodeURIComponent(cidade)}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Falha na busca.');
+      }
+
+      const result = await response.json();
+
       if (result && result.length > 0) {
         setResultados(result);
       } else {

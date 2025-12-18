@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +17,8 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 type Resultado = {
   nome: string;
@@ -34,12 +35,16 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
+  const [filtrarComTelefone, setFiltrarComTelefone] = useState(false);
+  const [filtrarComSite, setFiltrarComSite] = useState(false);
 
   const handleSearch = async () => {
     setLoading(true);
     setResultados([]);
     setError(null);
     setSearched(true);
+    setFiltrarComTelefone(false);
+    setFiltrarComSite(false);
 
     try {
       const response = await fetch(
@@ -65,6 +70,14 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  const resultadosFiltrados = useMemo(() => {
+    return resultados.filter(item => {
+      const temTelefone = !filtrarComTelefone || (filtrarComTelefone && item.telefone);
+      const temSite = !filtrarComSite || (filtrarComSite && item.site);
+      return temTelefone && temSite;
+    });
+  }, [resultados, filtrarComTelefone, filtrarComSite]);
 
   return (
     <main className="p-4 md:p-10 min-h-screen bg-black text-white relative overflow-hidden">
@@ -115,20 +128,33 @@ export default function Home() {
             transition={{ delay: 0.1 }}
           >
             <div className="p-4 space-y-4">
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                    placeholder="Cidade (ex: São Paulo)"
-                    value={cidade}
-                    onChange={e => setCidade(e.target.value)}
-                    className="bg-black/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-purple-500 focus-visible:border-purple-500 transition-all duration-300"
+                  placeholder="Cidade (ex: São Paulo)"
+                  value={cidade}
+                  onChange={e => setCidade(e.target.value)}
+                  className="bg-black/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-purple-500 focus-visible:border-purple-500 transition-all duration-300"
                 />
                 <Input
-                    placeholder="O que buscar? (ex: Barbearia)"
-                    value={busca}
-                    onChange={e => setBusca(e.target.value)}
-                    className="bg-black/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-purple-500 focus-visible:border-purple-500 transition-all duration-300"
+                  placeholder="O que buscar? (ex: Barbearia)"
+                  value={busca}
+                  onChange={e => setBusca(e.target.value)}
+                  className="bg-black/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-purple-500 focus-visible:border-purple-500 transition-all duration-300"
                 />
               </div>
+
+              {searched && resultados.length > 0 && (
+                <div className="pt-2 flex items-center space-x-6 text-sm text-zinc-400">
+                    <div className="flex items-center space-x-2">
+                        <Checkbox id="filtro-telefone" checked={filtrarComTelefone} onCheckedChange={(checked) => setFiltrarComTelefone(Boolean(checked))} className="border-zinc-600 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"/>
+                        <Label htmlFor="filtro-telefone" className="cursor-pointer">Com Telefone</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox id="filtro-site" checked={filtrarComSite} onCheckedChange={(checked) => setFiltrarComSite(Boolean(checked))} className="border-zinc-600 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500" />
+                        <Label htmlFor="filtro-site" className="cursor-pointer">Com Site</Label>
+                    </div>
+                </div>
+              )}
             </div>
 
             <div className="p-4 border-t border-white/[0.05] flex items-center justify-end">
@@ -166,16 +192,16 @@ export default function Home() {
                 </Alert>
             )}
 
-            {searched && !loading && !error && resultados.length === 0 && (
+            {searched && !loading && !error && resultadosFiltrados.length === 0 && (
                 <Alert className="mb-8 bg-zinc-900/50 border-zinc-800 text-zinc-300">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Sem Dados</AlertTitle>
-                <AlertDescription>Nenhum resultado encontrado nos parâmetros da busca.</AlertDescription>
+                <AlertDescription>Nenhum resultado encontrado para a sua busca ou filtros selecionados.</AlertDescription>
                 </Alert>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {resultados.map((item, index) => (
+                {resultadosFiltrados.map((item, index) => (
                 <Card
                     key={index}
                     className="bg-zinc-900/40 border-zinc-800/80 backdrop-blur-sm text-zinc-100 overflow-hidden hover:border-purple-500 hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-500 group relative"

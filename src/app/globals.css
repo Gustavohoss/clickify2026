@@ -332,4 +332,26 @@
     --stop-4: 75%;
     --stop-5: 100%;
   }
+  
+  .gradient-step-icon {
+    @apply relative;
+    background: radial-gradient(120% 120% at 100% 0%, #a855f7 0%, #5c2c88 40%, #1e1433 75%, #3d1d56 100%);
+  }
+
+  .gradient-step-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(200deg, hsla(270, 90%, 80%, 0.6), hsla(270, 90%, 80%, 0.2));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  
+  .gradient-step-icon-completed {
+      @apply relative;
+      background: radial-gradient(120% 120% at 100% 0%, #5c2c88 0%, #3d1d56 100%);
+  }
 }

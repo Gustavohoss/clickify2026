@@ -31,6 +31,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Link from 'next/link';
 import { GradientButton } from '@/components/ui/gradient-button';
+import { cn } from '@/lib/utils';
 
 const steps = [
   { id: '01', name: 'Informações Básicas', icon: FileText },
@@ -590,11 +591,11 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                     <li key={step.name} className="relative">
                     <div className="flex items-center space-x-3">
                         <div
-                        className={`h-10 w-10 rounded-full flex items-center justify-center transition-colors
-                            ${currentStep > index ? 'bg-purple-600 text-white' : ''}
-                            ${currentStep === index ? 'bg-purple-500 text-white border-2 border-purple-300 shadow-[0_0_15px_rgba(192,132,252,0.5)]' : ''}
-                            ${currentStep < index ? 'bg-zinc-800 text-zinc-400 border border-zinc-700' : ''}
-                        `}
+                        className={cn(`h-10 w-10 rounded-full flex items-center justify-center transition-colors`,
+                            currentStep > index && 'text-white gradient-step-icon-completed',
+                            currentStep === index && 'text-white gradient-step-icon shadow-[0_0_15px_rgba(192,132,252,0.5)]',
+                            currentStep < index && 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                        )}
                         >
                         {currentStep > index ? <Check className="w-5 h-5" /> : <step.icon className="w-5 h-5" />}
                         </div>

@@ -155,7 +155,7 @@ export default function ScraperPage() {
               )}
             </div>
 
-            <div className="p-4 border-t border-white/[0.05] flex items-center justify-end">
+            <div className="p-4 border-t border-white/[0.05] flex items-center justify-center md:justify-end">
               <GradientButton
                 variant="variant"
                 onClick={handleSearch}

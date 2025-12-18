@@ -14,14 +14,16 @@ export async function GET(request: NextRequest) {
   }
 
   const searchQuery = `${busca} em ${cidade}`;
-  const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&tbm=lcl`;
+  const url = `https://www.google.com/search?q=${encodeURIComponent(
+    searchQuery
+  )}&tbm=lcl`;
 
   try {
     const response = await fetch(url, {
       headers: {
-        // O User-Agent ajuda a simular um navegador real.
+        // O User-Agent ajuda a simular um navegador real e a evitar bloqueios.
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
       },
     });
 
@@ -34,46 +36,43 @@ export async function GET(request: NextRequest) {
 
     const resultados: {nome: string; info: string}[] = [];
 
-    // Esta é a parte delicada. Os seletores do Google podem mudar.
-    // Este seletor busca os cards de resultados locais.
-    $('div.uMdZh.tIxAd.translate-y').each((i, el) => {
-        if (resultados.length >= 10) return;
+    // Seletor atualizado e mais genérico para os resultados de busca local.
+    // O Google muda as classes com frequência. Este seletor busca pela estrutura.
+    $('div[jscontroller="xkZ6Lb"]').each((i, el) => {
+      if (resultados.length >= 10) return false; // Para o loop
 
-        const nomeEl = $(el).find('div.rllt__details div[role="heading"]');
-        const nome = nomeEl.text().trim();
+      const nome = $(el).find('div[role="heading"]').text().trim();
+      
+      // Busca pelo contêiner de detalhes e pega o texto da segunda div filha.
+      const infoContainer = $(el).find('div.rllt__details');
+      const info = infoContainer.find('> div:nth-child(2)').text().trim();
 
-        // Tenta pegar o endereço ou a categoria como info
-        const infoEl = $(el).find('div.rllt__details > div:nth-child(2)');
-        let info = infoEl.text().trim();
-        
-        // Remove o texto do nome da string de info, se presente
-        if (info.startsWith(nome)) {
-            info = info.substring(nome.length).trim();
-        }
-
-        if (nome) {
-            resultados.push({
-                nome,
-                info: info || 'N/A',
-            });
-        }
+      if (nome) {
+        resultados.push({
+          nome,
+          info: info || 'N/A',
+        });
+      }
     });
 
-    // Fallback para um seletor diferente se o primeiro não encontrar nada
+    // Fallback para outros seletores se o principal não funcionar.
     if (resultados.length === 0) {
-        $('div.VkpGBb').each((i, el) => {
-            if (resultados.length >= 10) return;
+      $('div.VkpGBb').each((i, el) => {
+        if (resultados.length >= 10) return false;
 
-            const nome = $(el).find('div[role="heading"]').text().trim();
-            const info = $(el).find('div.rllt__details > div:nth-child(2)').text().trim();
+        const nome = $(el).find('div[role="heading"]').text().trim();
+        const info = $(el)
+          .find('div.rllt__details > div:nth-child(2)')
+          .text()
+          .trim();
 
-            if (nome) {
-                resultados.push({
-                    nome,
-                    info: info.replace(nome, '').trim() || 'N/A'
-                });
-            }
-        });
+        if (nome) {
+          resultados.push({
+            nome,
+            info: info.replace(nome, '').trim() || 'N/A',
+          });
+        }
+      });
     }
 
     return NextResponse.json(resultados);

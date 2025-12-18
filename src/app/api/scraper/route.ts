@@ -39,51 +39,34 @@ export async function GET(request: NextRequest) {
 
     const resultados: {nome: string; info: string; telefone: string | null;}[] = [];
 
-    $('div[jscontroller="xkZ6Lb"]').each((i, el) => {
+    $('div.VkpGBb, div[jscontroller="xkZ6Lb"]').each((i, el) => {
       const nome = $(el).find('div[role="heading"]').text().trim();
-      
-      const infoContainer = $(el).find('div.rllt__details');
-      const infoText = infoContainer.find('> div:nth-child(2)').text().trim();
+      if (!nome) return; // Pula se não encontrar o nome
 
-      // Tenta extrair o telefone do texto de informações.
+      const infoContainer = $(el).find('div.rllt__details');
+      let infoText = infoContainer.find('> div:nth-child(2)').text().trim();
+
+      // Fallback se o primeiro seletor de info não funcionar
+      if (!infoText) {
+          infoText = infoContainer.text().replace(nome, '').trim();
+      }
+
       const phoneMatches = infoText.match(phoneRegex);
       const telefone = phoneMatches ? phoneMatches[0] : null;
 
-      // Remove o telefone do texto de info para não exibir duplicado.
-      const info = telefone ? infoText.replace(telefone, '').trim() : infoText;
-
-
-      if (nome) {
-        resultados.push({
-          nome,
-          info: info || 'N/A',
-          telefone,
-        });
+      // Remove o telefone e o nome do texto de info para não exibir duplicado.
+      let info = infoText;
+      if (telefone) {
+        info = info.replace(telefone, '');
       }
-    });
-
-    // Fallback para outra estrutura de resultados
-    if (resultados.length === 0) {
-      $('div.VkpGBb').each((i, el) => {
-        const nome = $(el).find('div[role="heading"]').text().trim();
-        const infoText = $(el)
-          .find('div.rllt__details > div:nth-child(2)')
-          .text()
-          .trim();
-        
-        const phoneMatches = infoText.match(phoneRegex);
-        const telefone = phoneMatches ? phoneMatches[0] : null;
-        const info = telefone ? infoText.replace(telefone, '').replace(nome, '').trim() : infoText.replace(nome, '').trim();
-
-        if (nome) {
-          resultados.push({
-            nome,
-            info: info || 'N/A',
-            telefone,
-          });
-        }
+      info = info.replace(nome, '').trim();
+      
+      resultados.push({
+        nome,
+        info: info || 'N/A',
+        telefone,
       });
-    }
+    });
 
     return NextResponse.json(resultados);
   } catch (error: any) {

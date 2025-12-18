@@ -9,14 +9,6 @@ type Resultado = {
   telefone: string | null;
 };
 
-// Mapeia o texto do 'aria-label' ou parte do 'data-test-id' para o campo correspondente
-const dataMap: {[key: string]: keyof Resultado} = {
-  'Endereço': 'endereco',
-  'Horário': 'horario',
-  'Website': 'site',
-  'Telefone': 'telefone',
-};
-
 export async function GET(request: NextRequest) {
   const {searchParams} = new URL(request.url);
   const busca = searchParams.get('busca');
@@ -53,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     $('div.VkpGBb, div[jscontroller="xkZ6Lb"]').each((i, el) => {
       const nome = $(el).find('div[role="heading"]').text().trim();
-      if (!nome) return; // Pula se não encontrar o nome
+      if (!nome) return;
 
       const resultado: Resultado = {
         nome,
@@ -63,36 +55,48 @@ export async function GET(request: NextRequest) {
         telefone: null,
       };
 
-      // Procura por todas as informações adicionais
-      $(el)
-        .find('div.rllt__details > div')
-        .each((j, detailEl) => {
-          const detailHtml = $(detailEl).html();
-          if (!detailHtml) return;
+      const detailsContainer = $(el).find('div.rllt__details');
 
-          for (const key in dataMap) {
-            if (detailHtml.includes(`aria-label="${key}"`) || detailHtml.includes(`data-test-id="${key}"`)) {
-              const field = dataMap[key];
-              if (!resultado[field]) {
-                resultado[field] = $(detailEl).text().trim();
-                break; 
-              }
+      // Extrair informações com base nos links e texto
+      detailsContainer.find('div').each((_, detailEl) => {
+        const text = $(detailEl).text().trim();
+        const link = $(detailEl).find('a').attr('href');
+        
+        // Endereço (geralmente não é um link, mas o primeiro item)
+        if (!resultado.endereco && !link) {
+           if (!text.includes('Aberto') && !text.includes('Fechado') && !text.includes('...')) {
+                resultado.endereco = text;
+           }
+        }
+        
+        // Horário
+        if (text.includes('Aberto') || text.includes('Fechado')) {
+            resultado.horario = text;
+        }
+      });
+      
+      // Site
+      detailsContainer.find('a[href*="url?q="]').each((_, siteEl) => {
+          const siteHref = $(siteEl).attr('href');
+          if (siteHref) {
+            const urlParams = new URLSearchParams(siteHref);
+            const realUrl = urlParams.get('q');
+            if(realUrl) {
+                resultado.site = new URL(realUrl).hostname;
+                return false;
             }
           }
-        });
-        
-       // Tenta extrair o telefone de um link `tel:` se não foi encontrado
-      if (!resultado.telefone) {
-        $(el).find('a[href^="tel:"]').each((j, phoneEl) => {
-            const phoneText = $(phoneEl).text().trim();
-            if(phoneText) {
-                resultado.telefone = phoneText;
-                return false; // para de procurar depois de encontrar o primeiro
-            }
-        });
-      }
+      });
 
-
+      // Telefone
+      detailsContainer.find('a[href^="tel:"]').each((_, phoneEl) => {
+        const phoneText = $(phoneEl).text().trim();
+        if (phoneText) {
+          resultado.telefone = phoneText;
+          return false;
+        }
+      });
+      
       resultados.push(resultado);
     });
 

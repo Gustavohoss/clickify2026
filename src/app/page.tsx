@@ -11,6 +11,7 @@ import {
   Globe,
   Clock,
   MapPin,
+  ExternalLink
 } from 'lucide-react';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 
@@ -120,7 +121,7 @@ export default function Home() {
 
       <div className="space-y-4">
         {resultados.map((item, index) => (
-          <Card key={index} className="bg-card shadow-md">
+          <Card key={index} className="bg-card shadow-md hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="text-lg text-card-foreground">{item.nome}</CardTitle>
             </CardHeader>
@@ -138,9 +139,18 @@ export default function Home() {
                 </div>
               )}
               {item.site && (
-                <div className="flex items-start text-sm text-muted-foreground">
+                <div className="flex items-start text-sm text-muted-foreground group">
                   <Globe className="mr-3 h-4 w-4 shrink-0 mt-1" />
-                   <a href={`http://${item.site}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{item.site}</a>
+                    {/* AQUI FOI FEITA A MUDANÇA PRINCIPAL */}
+                    <a 
+                      href={item.site} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-blue-600 hover:underline break-all flex items-center gap-1"
+                    >
+                      {item.site}
+                      <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
                 </div>
               )}
               {item.telefone && (

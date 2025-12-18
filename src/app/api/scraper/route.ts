@@ -1,4 +1,4 @@
-import {NextRequest, NextResponse} from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
 type Resultado = {
@@ -10,27 +10,28 @@ type Resultado = {
 };
 
 export async function GET(request: NextRequest) {
-  const {searchParams} = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const busca = searchParams.get('busca');
   const cidade = searchParams.get('cidade');
 
   if (!busca || !cidade) {
     return NextResponse.json(
-      {error: 'Parâmetros "busca" e "cidade" são obrigatórios.'},
-      {status: 400}
+      { error: 'Parâmetros "busca" e "cidade" são obrigatórios.' },
+      { status: 400 }
     );
   }
 
   const searchQuery = `${busca} em ${cidade}`;
+  // hl=pt-BR força o Google a retornar termos em português
   const url = `https://www.google.com/search?q=${encodeURIComponent(
     searchQuery
-  )}&tbm=lcl`;
+  )}&tbm=lcl&hl=pt-BR`;
 
   try {
     const response = await fetch(url, {
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       },
     });
 
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     const resultados: Resultado[] = [];
 
-    $('div.VkpGBb, div[jscontroller="xkZ6Lb"]').each((i, el) => {
+    $('div.VkpGBb').each((i, el) => {
       const nome = $(el).find('div[role="heading"]').text().trim();
       if (!nome) return;
 
@@ -55,54 +56,64 @@ export async function GET(request: NextRequest) {
         telefone: null,
       };
 
+      const fullText = $(el).text();
+
+      // --- 1. TELEFONE ---
+      const phoneRegex = /\(?\d{2}\)?\s?\d{4,5}-?\d{4}/;
+      const phoneMatch = fullText.match(phoneRegex);
+      if (phoneMatch) {
+        resultado.telefone = phoneMatch[0];
+      }
+
+      // --- 2. ENDEREÇO E HORÁRIO ---
       const detailsContainer = $(el).find('div.rllt__details');
-
-      // Tenta encontrar o endereço, horário, site e telefone
-      detailsContainer.find('div').each((_, detailEl) => {
+      detailsContainer.find('div, span').each((_, detailEl) => {
         const text = $(detailEl).text().trim();
-
-        // Endereço (geralmente não é um link, mas o primeiro item sem info de horário)
-        if (!resultado.endereco && !text.includes('Aberto') && !text.includes('Fechado') && !text.match(/\d/)) {
+        
+        if (text.includes('Aberto') || text.includes('Fechado') || text.includes('Fecha às')) {
+           resultado.horario = text;
+        } 
+        else if (
+            !resultado.endereco && 
+            text.length > 10 && 
+            text !== nome && 
+            !text.match(phoneRegex) 
+        ) {
             resultado.endereco = text;
         }
+      });
+
+      // --- 3. EXTRAÇÃO DO SITE ---
+      $(el).find('a').each((_, linkEl) => {
+        const href = $(linkEl).attr('href');
         
-        // Horário
-        if (text.includes('Aberto') || text.includes('Fechado')) {
-            resultado.horario = text;
+        if (!href) return;
+
+        let potentialLink: string | null = null;
+
+        // Extrai o link real de dentro do redirecionador do Google
+        if (href.includes('/url?q=')) {
+            const urlParams = new URLSearchParams(href.split('?')[1]);
+            potentialLink = urlParams.get('q');
+        } else if (href.startsWith('http')) {
+            potentialLink = href;
         }
-      });
-      
-      // Site
-      detailsContainer.find('a[href*="url?q="]').each((_, siteEl) => {
-          const siteHref = $(siteEl).attr('href');
-          if (siteHref) {
-            const urlParams = new URLSearchParams(siteHref);
-            const realUrl = urlParams.get('q');
-            if(realUrl) {
-                try {
-                    resultado.site = new URL(realUrl).hostname.replace('www.', '');
-                    return false; // para de procurar depois de encontrar o primeiro
-                } catch (e) {
-                    // ignora urls invalidas
-                }
+
+        if (potentialLink) {
+            const ignoreList = ['google.com', 'google.com.br', 'gstatic.com', 'youtube.com'];
+            const isGoogle = ignoreList.some(domain => potentialLink?.includes(domain));
+
+            if (!isGoogle) {
+                // AQUI ESTAVA O PROBLEMA:
+                // Antes fazíamos "hostname.replace...", o que cortava o link.
+                // Agora salvamos o link COMPLETO:
+                resultado.site = potentialLink;
+                
+                return false; // Para de procurar ao encontrar o primeiro site válido
             }
-          }
-      });
-
-      // Telefone
-      detailsContainer.find('a[href^="tel:"]').each((_, phoneEl) => {
-        const phoneText = $(phoneEl).text().trim();
-        if (phoneText) {
-          resultado.telefone = phoneText;
-          return false; // para de procurar
         }
       });
 
-      // Se o endereço ainda for o nome, limpa ele
-      if (resultado.endereco === resultado.nome) {
-        resultado.endereco = null;
-      }
-      
       resultados.push(resultado);
     });
 
@@ -110,8 +121,8 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Erro no scraper:', error);
     return NextResponse.json(
-      {error: 'Ocorreu um erro ao processar a busca.'},
-      {status: 500}
+      { error: 'Ocorreu um erro ao processar a busca.' },
+      { status: 500 }
     );
   }
 }

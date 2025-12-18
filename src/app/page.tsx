@@ -12,6 +12,7 @@ import {
   Clock,
   MapPin,
   ExternalLink,
+  SendIcon,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { motion, AnimatePresence } from 'framer-motion';

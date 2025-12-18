@@ -59,10 +59,6 @@ const colorPalettes = [
     colors: { primary: '#635BFF', secondary: '#F6F8FA', background: '#FFFFFF', text: '#0A2540' }
   },
   { 
-    name: 'Linear (Elegante)', 
-    colors: { primary: '#5E6AD2', secondary: '#1A1C23', background: '#0B0C10', text: '#FFFFFF' }
-  },
-  { 
     name: 'Vercel (Clean)', 
     colors: { primary: '#0070F3', secondary: '#EAEAEA', background: '#FFFFFF', text: '#000000' }
   },
@@ -115,6 +111,10 @@ const colorPalettes = [
     colors: { primary: '#007AFF', secondary: '#F5F5F7', background: '#FFFFFF', text: '#1D1D1F' }
   },
   { 
+    name: 'Linear (Elegante)', 
+    colors: { primary: '#5E6AD2', secondary: '#1A1C23', background: '#0B0C10', text: '#FFFFFF' }
+  },
+  { 
     name: 'Padrão (Violeta)', 
     colors: { primary: '#6D28D9', secondary: '#1F2937', background: '#0A0A0A', text: '#F9FAFB' }
   },
@@ -136,6 +136,18 @@ const colorPalettes = [
   }
 ];
 
+const fontOptions = [
+    'Inter, sans-serif',
+    'Montserrat, sans-serif',
+    'Lato, sans-serif',
+    'Open Sans, sans-serif',
+    'Roboto, sans-serif',
+    'Poppins, sans-serif',
+    'Oswald, sans-serif',
+    'Raleway, sans-serif',
+    'Nunito, sans-serif',
+    'Playfair Display, serif',
+  ];
 
 export default function PromptBuilderPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -442,8 +454,17 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tipografia" className="text-white/80">Tipografia</Label>
-              <Input id="tipografia" name="tipografia" value={formData.tipografia} onChange={handleChange} placeholder="Ex: Inter, Montserrat" className="bg-white/5 border-white/10 text-white" />
+              <Label className="text-white/80">Tipografia</Label>
+                <Select name="tipografia" value={formData.tipografia} onValueChange={(value) => handleSelectChange('tipografia', value)}>
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-zinc-900 text-white border-zinc-800">
+                    {fontOptions.map(font => (
+                        <SelectItem key={font} value={font} style={{ fontFamily: font }}>
+                        {font.split(',')[0]}
+                        </SelectItem>
+                    ))}
+                    </SelectContent>
+                </Select>
             </div>
           </motion.div>
         );
@@ -582,5 +603,3 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
     </main>
   );
 }
-
-    

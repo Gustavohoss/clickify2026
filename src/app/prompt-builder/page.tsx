@@ -350,10 +350,21 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
             <div className="flex justify-between items-center">
                 <h3 className="text-xl font-bold text-white">Seu Prompt Gerado</h3>
-                <Button onClick={copyToClipboard} variant="ghost" size="sm" className="text-purple-400 hover:text-purple-300 hover:bg-white/10">
-                {copied ? <Check className="w-4 h-4 mr-2" /> : <Clipboard className="w-4 h-4 mr-2" />}
-                {copied ? 'Copiado!' : 'Copiar'}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button
+                        onClick={prevStep}
+                        variant="ghost"
+                        size="sm"
+                        className="text-white/70 hover:text-white hover:bg-white/10"
+                    >
+                        <ChevronLeft className="w-4 h-4 mr-2" />
+                        Voltar
+                    </Button>
+                    <Button onClick={copyToClipboard} variant="ghost" size="sm" className="text-purple-400 hover:text-purple-300 hover:bg-white/10">
+                    {copied ? <Check className="w-4 h-4 mr-2" /> : <Clipboard className="w-4 h-4 mr-2" />}
+                    {copied ? 'Copiado!' : 'Copiar'}
+                    </Button>
+                </div>
             </div>
             <pre className="w-full bg-white/5 p-4 rounded-lg text-white/90 text-xs overflow-x-auto whitespace-pre-wrap font-mono h-[500px]">
                 {generatedPrompt}

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -19,6 +18,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { GradientButton } from '@/components/ui/gradient-button';
 
 type Resultado = {
   nome: string;
@@ -156,27 +156,18 @@ export default function ScraperPage() {
             </div>
 
             <div className="p-4 border-t border-white/[0.05] flex items-center justify-end">
-              <motion.button
-                type="button"
+              <GradientButton
+                variant="variant"
                 onClick={handleSearch}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
                 disabled={loading || !cidade || !busca}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-all',
-                  'flex items-center gap-2',
-                  (cidade && busca)
-                    ? 'bg-white text-[#0A0A0B] shadow-lg shadow-white/10'
-                    : 'bg-white/[0.05] text-white/40'
-                )}
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-[spin_2s_linear_infinite]" />
                 ) : (
                   <Send className="w-4 h-4" />
                 )}
-                <span>{loading ? 'Processando...' : 'INICIAR VARREDURA'}</span>
-              </motion.button>
+                <span className="ml-2">{loading ? 'Processando...' : 'INICIAR VARREDURA'}</span>
+              </GradientButton>
             </div>
           </motion.div>
         </motion.div>

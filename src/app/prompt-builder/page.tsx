@@ -53,6 +53,29 @@ type FormData = {
   inspiration: string;
 };
 
+const colorPalettes = [
+  { 
+    name: 'Padrão (Violeta)', 
+    colors: { primary: '#6D28D9', secondary: '#1F2937', background: '#0A0A0A', text: '#F9FAFB' }
+  },
+  { 
+    name: 'Floresta Sombria', 
+    colors: { primary: '#22C55E', secondary: '#1A2E26', background: '#0C1410', text: '#E2F9E9' }
+  },
+  { 
+    name: 'Oceano Profundo', 
+    colors: { primary: '#3B82F6', secondary: '#1E293B', background: '#0F172A', text: '#D1E3FF' }
+  },
+  { 
+    name: 'Pôr do Sol', 
+    colors: { primary: '#F97316', secondary: '#4A2111', background: '#1C0D05', text: '#FFEAD9' }
+  },
+  {
+    name: 'Neon Noturno',
+    colors: { primary: '#EC4899', secondary: '#391A2C', background: '#120A0F', text: '#FCE7F3' }
+  }
+];
+
 export default function PromptBuilderPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
@@ -65,10 +88,10 @@ export default function PromptBuilderPage() {
     funcionalidades: '',
     isInstitutional: true,
     visualStyle: 'Moderno e Profissional',
-    primaryColor: '#6D28D9',
-    secondaryColor: '#1F2937',
-    backgroundColor: '#0A0A0A',
-    textColor: '#F9FAFB',
+    primaryColor: colorPalettes[0].colors.primary,
+    secondaryColor: colorPalettes[0].colors.secondary,
+    backgroundColor: colorPalettes[0].colors.background,
+    textColor: colorPalettes[0].colors.text,
     tipografia: 'Inter, sans-serif',
     specialRequirements: '',
     inspiration: '',
@@ -85,6 +108,19 @@ export default function PromptBuilderPage() {
 
   const handleSelectChange = (name: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePaletteChange = (paletteName: string) => {
+    const selectedPalette = colorPalettes.find(p => p.name === paletteName);
+    if (selectedPalette) {
+      setFormData(prev => ({
+        ...prev,
+        primaryColor: selectedPalette.colors.primary,
+        secondaryColor: selectedPalette.colors.secondary,
+        backgroundColor: selectedPalette.colors.background,
+        textColor: selectedPalette.colors.text,
+      }));
+    }
   };
 
   const nextStep = () => {
@@ -290,26 +326,57 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+                <Label className="text-white/80">Paletas de Cores Pré-definidas</Label>
+                <Select onValueChange={handlePaletteChange}>
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="Selecione uma paleta" /></SelectTrigger>
+                  <SelectContent className="bg-zinc-900 text-white border-zinc-800">
+                    {colorPalettes.map((palette) => (
+                      <SelectItem key={palette.name} value={palette.name}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: palette.colors.primary }} />
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: palette.colors.secondary }} />
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: palette.colors.background }} />
+                           <div className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: palette.colors.text }} />
+                          <span>{palette.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
             <div className="space-y-4">
-              <Label className="text-white/80">Paleta de Cores</Label>
+              <Label className="text-white/80">Personalizar Paleta</Label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="primaryColor" className="text-sm text-white/60">Primária</Label>
                   <div className="relative">
-                    <Input id="primaryColor" name="primaryColor" type="color" value={formData.primaryColor} onChange={handleChange} className="w-full h-10 p-0 border-none cursor-pointer" />
+                    <Input id="primaryColor" name="primaryColor" type="color" value={formData.primaryColor} onChange={handleChange} className="w-full h-10 p-0 border-none cursor-pointer bg-transparent" />
+                     <div className="absolute inset-0 rounded-md pointer-events-none border border-white/20" style={{backgroundColor: formData.primaryColor}}></div>
                   </div>
                 </div>
                  <div className="space-y-2">
                   <Label htmlFor="secondaryColor" className="text-sm text-white/60">Secundária</Label>
-                  <Input id="secondaryColor" name="secondaryColor" type="color" value={formData.secondaryColor} onChange={handleChange} className="w-full h-10 p-0 border-none cursor-pointer" />
+                   <div className="relative">
+                    <Input id="secondaryColor" name="secondaryColor" type="color" value={formData.secondaryColor} onChange={handleChange} className="w-full h-10 p-0 border-none cursor-pointer bg-transparent" />
+                    <div className="absolute inset-0 rounded-md pointer-events-none border border-white/20" style={{backgroundColor: formData.secondaryColor}}></div>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="backgroundColor" className="text-sm text-white/60">Fundo</Label>
-                  <Input id="backgroundColor" name="backgroundColor" type="color" value={formData.backgroundColor} onChange={handleChange} className="w-full h-10 p-0 border-none cursor-pointer" />
+                   <div className="relative">
+                    <Input id="backgroundColor" name="backgroundColor" type="color" value={formData.backgroundColor} onChange={handleChange} className="w-full h-10 p-0 border-none cursor-pointer bg-transparent" />
+                    <div className="absolute inset-0 rounded-md pointer-events-none border border-white/20" style={{backgroundColor: formData.backgroundColor}}></div>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="textColor" className="text-sm text-white/60">Texto</Label>
-                  <Input id="textColor" name="textColor" type="color" value={formData.textColor} onChange={handleChange} className="w-full h-10 p-0 border-none cursor-pointer" />
+                  <div className="relative">
+                    <Input id="textColor" name="textColor" type="color" value={formData.textColor} onChange={handleChange} className="w-full h-10 p-0 border-none cursor-pointer bg-transparent" />
+                    <div className="absolute inset-0 rounded-md pointer-events-none border border-white/20" style={{backgroundColor: formData.textColor}}></div>
+                  </div>
                 </div>
               </div>
             </div>

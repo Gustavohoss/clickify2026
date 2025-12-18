@@ -554,7 +554,7 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                 {generatedPrompt}
             </pre>
             <div className="flex justify-center pt-4">
-              <Link href="/creator" passHref>
+              <Link href="https://lovable.dev/invite/9JZ3191" passHref>
                 <GradientButton variant="variant">
                   <Sparkles className="w-4 h-4" />
                   <span className="ml-2">Criar site!</span>

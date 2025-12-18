@@ -296,4 +296,40 @@
     --stop-4: 75%;
     --stop-5: 100%;
   }
+  
+  .gradient-button-green {
+    --color-1: #102d23;
+    --color-2: #163f2d;
+    --color-3: #1a5137;
+    --color-4: #22c55e;
+    --color-5: #4ade80;
+    --border-angle: 200deg;
+    --border-color-1: hsla(145, 63%, 49%, 0.4);
+    --border-color-2: hsla(145, 63%, 49%, 0.1);
+    --stop-1: 0%;
+    --stop-2: 45%;
+    --stop-3: 60%;
+    --stop-4: 85%;
+    --stop-5: 100%;
+  }
+
+  .gradient-button-green:hover {
+    --pos-x: 100%;
+    --pos-y: 0%;
+    --spread-x: 120%;
+    --spread-y: 120%;
+    --color-1: #4ade80;
+    --color-2: #22c55e;
+    --color-3: #1a5137;
+    --color-4: #163f2d;
+    --color-5: #102d23;
+    --border-angle: 200deg;
+    --border-color-1: hsla(145, 63%, 49%, 0.6);
+    --border-color-2: hsla(145, 63%, 49%, 0.2);
+    --stop-1: 0%;
+    --stop-2: 15%;
+    --stop-3: 40%;
+    --stop-4: 75%;
+    --stop-5: 100%;
+  }
 }

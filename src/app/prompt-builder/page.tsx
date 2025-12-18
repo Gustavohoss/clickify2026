@@ -635,10 +635,10 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                         <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
                 ) : (
-                    <Button onClick={generatePrompt} className="bg-green-600 hover:bg-green-700 text-white">
-                        Gerar Prompt
-                        <Code className="w-4 h-4 ml-2" />
-                    </Button>
+                  <GradientButton onClick={generatePrompt} className="gradient-button-green">
+                      <Code className="w-4 h-4" />
+                      <span className="ml-2">Gerar Prompt</span>
+                  </GradientButton>
                 )}
             </div>
         )}

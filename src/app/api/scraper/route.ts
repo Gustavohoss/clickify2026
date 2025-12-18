@@ -40,8 +40,6 @@ export async function GET(request: NextRequest) {
     const resultados: {nome: string; info: string; telefone: string | null;}[] = [];
 
     $('div[jscontroller="xkZ6Lb"]').each((i, el) => {
-      if (resultados.length >= 10) return false;
-
       const nome = $(el).find('div[role="heading"]').text().trim();
       
       const infoContainer = $(el).find('div.rllt__details');
@@ -67,8 +65,6 @@ export async function GET(request: NextRequest) {
     // Fallback para outra estrutura de resultados
     if (resultados.length === 0) {
       $('div.VkpGBb').each((i, el) => {
-        if (resultados.length >= 10) return false;
-
         const nome = $(el).find('div[role="heading"]').text().trim();
         const infoText = $(el)
           .find('div.rllt__details > div:nth-child(2)')
@@ -87,10 +83,6 @@ export async function GET(request: NextRequest) {
           });
         }
       });
-    }
-
-    if (resultados.length === 0) {
-        setError('Nenhum resultado encontrado para sua busca.');
     }
 
     return NextResponse.json(resultados);

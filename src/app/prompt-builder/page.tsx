@@ -55,10 +55,6 @@ type FormData = {
 
 const colorPalettes = [
   { 
-    name: 'Padrão (Violeta)', 
-    colors: { primary: '#6D28D9', secondary: '#1F2937', background: '#0A0A0A', text: '#F9FAFB' }
-  },
-  { 
     name: 'Stripe (Moderno)', 
     colors: { primary: '#635BFF', secondary: '#F6F8FA', background: '#FFFFFF', text: '#0A2540' }
   },
@@ -69,22 +65,6 @@ const colorPalettes = [
   { 
     name: 'Vercel (Clean)', 
     colors: { primary: '#0070F3', secondary: '#EAEAEA', background: '#FFFFFF', text: '#000000' }
-  },
-  { 
-    name: 'Floresta Sombria', 
-    colors: { primary: '#22C55E', secondary: '#1A2E26', background: '#0C1410', text: '#E2F9E9' }
-  },
-  { 
-    name: 'Oceano Profundo', 
-    colors: { primary: '#3B82F6', secondary: '#1E293B', background: '#0F172A', text: '#D1E3FF' }
-  },
-  { 
-    name: 'Pôr do Sol', 
-    colors: { primary: '#F97316', secondary: '#4A2111', background: '#1C0D05', text: '#FFEAD9' }
-  },
-  {
-    name: 'Neon Noturno',
-    colors: { primary: '#EC4899', secondary: '#391A2C', background: '#120A0F', text: '#FCE7F3' }
   },
   {
     name: 'Amazon',
@@ -133,6 +113,26 @@ const colorPalettes = [
   {
     name: 'Apple (Clean)',
     colors: { primary: '#007AFF', secondary: '#F5F5F7', background: '#FFFFFF', text: '#1D1D1F' }
+  },
+  { 
+    name: 'Padrão (Violeta)', 
+    colors: { primary: '#6D28D9', secondary: '#1F2937', background: '#0A0A0A', text: '#F9FAFB' }
+  },
+  { 
+    name: 'Floresta Sombria', 
+    colors: { primary: '#22C55E', secondary: '#1A2E26', background: '#0C1410', text: '#E2F9E9' }
+  },
+  { 
+    name: 'Oceano Profundo', 
+    colors: { primary: '#3B82F6', secondary: '#1E293B', background: '#0F172A', text: '#D1E3FF' }
+  },
+  { 
+    name: 'Pôr do Sol', 
+    colors: { primary: '#F97316', secondary: '#4A2111', background: '#1C0D05', text: '#FFEAD9' }
+  },
+  {
+    name: 'Neon Noturno',
+    colors: { primary: '#EC4899', secondary: '#391A2C', background: '#120A0F', text: '#FCE7F3' }
   }
 ];
 

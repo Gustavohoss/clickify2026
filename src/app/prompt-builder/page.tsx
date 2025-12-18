@@ -29,7 +29,7 @@ import { Label } from '@/components/ui/label';
 const steps = [
   { id: '01', name: 'Informações Básicas', icon: FileText },
   { id: '02', name: 'Design e Estilo', icon: Palette },
-  { id: '03', name: 'Público e Funcionalidades', icon: Target },
+  { id: '03', name: 'Público e Funções', icon: Target },
   { id: '04', name: 'Detalhes Adicionais', icon: Settings },
   { id: '05', name: 'Revisão e Geração', icon: Code },
 ];

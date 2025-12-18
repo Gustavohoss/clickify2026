@@ -26,6 +26,7 @@ import {
   Code,
   Sparkles,
   Send,
+  ArrowLeft,
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -575,6 +576,18 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
       </div>
 
       <div className="w-full max-w-4xl mx-auto relative z-10">
+         <div className="absolute top-0 left-0">
+          <Link href="/painel" passHref>
+            <Button
+              variant="ghost"
+              className="text-white/70 hover:text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar ao Painel
+            </Button>
+          </Link>
+        </div>
+        
         <div className="text-center mb-12 space-y-2">
             <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60 pb-2">
                 Construtor de Prompts

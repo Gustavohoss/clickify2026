@@ -1,6 +1,10 @@
 import {NextRequest, NextResponse} from 'next/server';
 import * as cheerio from 'cheerio';
 
+// Regex para encontrar números de telefone no formato brasileiro.
+// Cobre formatos como (XX) XXXX-XXXX, (XX) XXXXX-XXXX, etc.
+const phoneRegex = /(?:\(?\d{2}\)?\s?)?(?:\d{4,5}-?\d{4})/g;
+
 export async function GET(request: NextRequest) {
   const {searchParams} = new URL(request.url);
   const busca = searchParams.get('busca');
@@ -21,9 +25,8 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetch(url, {
       headers: {
-        // O User-Agent ajuda a simular um navegador real e a evitar bloqueios.
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
       },
     });
 
@@ -34,42 +37,53 @@ export async function GET(request: NextRequest) {
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    const resultados: {nome: string; info: string}[] = [];
+    const resultados: {nome: string; info: string; telefone: string | null;}[] = [];
 
-    // Seletor atualizado e mais genérico para os resultados de busca local.
-    // O Google muda as classes com frequência. Este seletor busca pela estrutura.
     $('div[jscontroller="xkZ6Lb"]').each((i, el) => {
-      if (resultados.length >= 10) return false; // Para o loop
+      if (resultados.length >= 10) return false;
 
       const nome = $(el).find('div[role="heading"]').text().trim();
       
-      // Busca pelo contêiner de detalhes e pega o texto da segunda div filha.
       const infoContainer = $(el).find('div.rllt__details');
-      const info = infoContainer.find('> div:nth-child(2)').text().trim();
+      const infoText = infoContainer.find('> div:nth-child(2)').text().trim();
+
+      // Tenta extrair o telefone do texto de informações.
+      const phoneMatches = infoText.match(phoneRegex);
+      const telefone = phoneMatches ? phoneMatches[0] : null;
+
+      // Remove o telefone do texto de info para não exibir duplicado.
+      const info = telefone ? infoText.replace(telefone, '').trim() : infoText;
+
 
       if (nome) {
         resultados.push({
           nome,
           info: info || 'N/A',
+          telefone,
         });
       }
     });
 
-    // Fallback para outros seletores se o principal não funcionar.
+    // Fallback
     if (resultados.length === 0) {
       $('div.VkpGBb').each((i, el) => {
         if (resultados.length >= 10) return false;
 
         const nome = $(el).find('div[role="heading"]').text().trim();
-        const info = $(el)
+        const infoText = $(el)
           .find('div.rllt__details > div:nth-child(2)')
           .text()
           .trim();
+        
+        const phoneMatches = infoText.match(phoneRegex);
+        const telefone = phoneMatches ? phoneMatches[0] : null;
+        const info = telefone ? infoText.replace(telefone, '').replace(nome, '').trim() : infoText.replace(nome, '').trim();
 
         if (nome) {
           resultados.push({
             nome,
-            info: info.replace(nome, '').trim() || 'N/A',
+            info: info || 'N/A',
+            telefone,
           });
         }
       });

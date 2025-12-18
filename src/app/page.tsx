@@ -4,12 +4,13 @@ import {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import {Loader2, AlertCircle} from 'lucide-react';
+import {Loader2, AlertCircle, Phone, Info} from 'lucide-react';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 
 type Resultado = {
   nome: string;
   info: string;
+  telefone: string | null;
 };
 
 export default function Home() {
@@ -104,8 +105,17 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="text-lg">{item.nome}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">{item.info}</p>
+            <CardContent className="space-y-2">
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Info className="mr-2 h-4 w-4" />
+                <p>{item.info}</p>
+              </div>
+              {item.telefone && (
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Phone className="mr-2 h-4 w-4" />
+                  <p>{item.telefone}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}

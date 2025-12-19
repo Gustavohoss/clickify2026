@@ -61,7 +61,7 @@ export default function LandingPage() {
                   </motion.div>
                 </GradientButton>
               </Link>
-              <div className="shadow-[0_0_30px_5px_rgba(192,132,252,0.15)] rounded-2xl">
+              <div className="shadow-[0_0_30px_5px_rgba(192,132,252,0.15)] rounded-2xl w-full">
                 <Safari_01 />
               </div>
             </motion.div>

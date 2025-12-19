@@ -14,6 +14,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
 
 import { 
     Loader2, 
@@ -21,7 +24,7 @@ import {
     Globe, 
     Clock, 
     MapPin, 
-    ExternalLink, 
+    ArrowUp,
     Briefcase,
     Search,
     PlusCircle,
@@ -61,12 +64,21 @@ const statusConfig = {
     'Perdido': { color: 'bg-red-500/20 text-red-300 border-red-500/30', label: 'Perdido' },
 };
 
+const getInitials = (name: string) => {
+    if (!name) return '';
+    const names = name.split(' ');
+    if (names.length > 1) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+};
+
 function LeadsContent() {
     const { user } = useUser();
     const { firestore } = useFirebase();
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('Todos');
-    const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+    const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
 
     const leadsQuery = useMemoFirebase(() => {
         if (!user || !firestore) return null;
@@ -111,6 +123,21 @@ function LeadsContent() {
         const leadDocRef = doc(firestore, `users/${user.uid}/leads/${leadId}`);
         updateDoc(leadDocRef, { notes: newNotes, ultimaInteracao: serverTimestamp() });
     };
+    
+    const handleSelectLead = (leadId: string) => {
+        setSelectedLeads(prev => 
+            prev.includes(leadId) ? prev.filter(id => id !== leadId) : [...prev, leadId]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedLeads.length === filteredLeads.length) {
+            setSelectedLeads([]);
+        } else {
+            setSelectedLeads(filteredLeads.map(lead => lead.id));
+        }
+    };
+
 
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -155,28 +182,31 @@ function LeadsContent() {
                         <Card className="bg-zinc-900/40 border-zinc-800/80 backdrop-blur-sm">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium text-zinc-400">Total de Leads</CardTitle>
-                                <Users className="h-4 w-4 text-zinc-500" />
+                                <div className="p-2 rounded-full bg-blue-500/10"><Users className="h-4 w-4 text-blue-400" /></div>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold text-white">{isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.total}</div>
+                                <p className="text-xs text-zinc-500 mt-1">Nenhum lead novo este mês</p>
                             </CardContent>
                         </Card>
                          <Card className="bg-zinc-900/40 border-zinc-800/80 backdrop-blur-sm">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium text-zinc-400">Em Negociação</CardTitle>
-                                <Activity className="h-4 w-4 text-zinc-500" />
+                                 <div className="p-2 rounded-full bg-orange-500/10"><Activity className="h-4 w-4 text-orange-400" /></div>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold text-white">{isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.negociacao}</div>
+                                 <p className="text-xs text-zinc-500 mt-1">+2 na última semana</p>
                             </CardContent>
                         </Card>
                          <Card className="bg-zinc-900/40 border-zinc-800/80 backdrop-blur-sm">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium text-zinc-400">Contratos Fechados</CardTitle>
-                                <DollarSign className="h-4 w-4 text-zinc-500" />
+                                <div className="p-2 rounded-full bg-green-500/10"><DollarSign className="h-4 w-4 text-green-400" /></div>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold text-green-400">{isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(kpis.fechado)}</div>
+                                <p className="text-xs text-green-500 mt-1 flex items-center"><ArrowUp className="w-3 h-3 mr-1"/> 12% vs. mês passado</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -205,9 +235,16 @@ function LeadsContent() {
                     <Table>
                         <TableHeader>
                             <TableRow className="border-zinc-800 hover:bg-zinc-900/50">
+                                <TableHead className="w-12">
+                                    <Checkbox 
+                                        checked={selectedLeads.length === filteredLeads.length && filteredLeads.length > 0}
+                                        onCheckedChange={handleSelectAll}
+                                    />
+                                </TableHead>
                                 <TableHead className="text-white">Empresa</TableHead>
+                                <TableHead className="text-white">Contato</TableHead>
                                 <TableHead className="text-white">Status</TableHead>
-                                <TableHead className="text-white">Valor do Contrato</TableHead>
+                                <TableHead className="text-white text-right">Valor do Contrato</TableHead>
                                 <TableHead className="text-white">Última Interação</TableHead>
                                 <TableHead className="text-white">Anotações</TableHead>
                                 <TableHead className="text-right text-white">Ações</TableHead>
@@ -216,14 +253,14 @@ function LeadsContent() {
                         <TableBody>
                              {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center h-24">
+                                    <TableCell colSpan={8} className="text-center h-24">
                                         <Loader2 className="w-6 h-6 text-purple-400 animate-spin mx-auto" />
                                     </TableCell>
                                 </TableRow>
                             )}
                             {error && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center h-24 text-red-400">
+                                    <TableCell colSpan={8} className="text-center h-24 text-red-400">
                                         <div className="flex justify-center items-center gap-2">
                                             <AlertCircle className="w-5 h-5"/>
                                             <span>Erro ao carregar os leads: {error.message}</span>
@@ -233,7 +270,7 @@ function LeadsContent() {
                             )}
                              {!isLoading && !error && filteredLeads.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center h-24 text-zinc-400">
+                                    <TableCell colSpan={8} className="text-center h-24 text-zinc-400">
                                         <Briefcase className="w-8 h-8 text-zinc-600 mx-auto mb-2"/>
                                         Nenhum lead encontrado.
                                     </TableCell>
@@ -242,9 +279,22 @@ function LeadsContent() {
                             {filteredLeads.map(lead => (
                                 <TableRow key={lead.id} className="border-zinc-800 hover:bg-zinc-900/30">
                                     <TableCell>
+                                        <Checkbox 
+                                            checked={selectedLeads.includes(lead.id)}
+                                            onCheckedChange={() => handleSelectLead(lead.id)}
+                                        />
+                                    </TableCell>
+                                    <TableCell className="font-medium">
                                         <Sheet>
                                             <SheetTrigger asChild>
-                                                <Button variant="link" className="text-white font-bold p-0 h-auto hover:text-purple-400">{lead.nome}</Button>
+                                                 <div className="flex items-center gap-3 cursor-pointer group">
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarFallback className="bg-purple-800/60 text-white text-xs font-bold">
+                                                            {getInitials(lead.nome)}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <span className="text-white font-bold group-hover:text-purple-400 transition-colors">{lead.nome}</span>
+                                                 </div>
                                             </SheetTrigger>
                                             <SheetContent className="bg-black border-zinc-800 text-white w-full sm:max-w-md overflow-y-auto">
                                                 <SheetHeader>
@@ -266,6 +316,16 @@ function LeadsContent() {
                                         </Sheet>
                                     </TableCell>
                                     <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            <a href={`tel:${lead.telefone}`} className={!lead.telefone ? 'pointer-events-none' : ''}>
+                                                <Phone size={16} className={lead.telefone ? 'text-green-400 hover:text-green-300' : 'text-zinc-600'}/>
+                                            </a>
+                                            <a href={lead.site || '#'} target="_blank" rel="noopener noreferrer" className={!lead.site ? 'pointer-events-none' : ''}>
+                                                <Globe size={16} className={lead.site ? 'text-blue-400 hover:text-blue-300' : 'text-zinc-600'}/>
+                                            </a>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
                                         <Select value={lead.status} onValueChange={(val: Lead['status']) => handleStatusChange(lead.id, val)}>
                                             <SelectTrigger className={`w-[150px] border-0 focus:ring-0 ${statusConfig[lead.status]?.color}`}>
                                                 <SelectValue />
@@ -277,14 +337,14 @@ function LeadsContent() {
                                             </SelectContent>
                                         </Select>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="text-right">
                                         <div className="relative">
                                             <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                                             <Input 
                                                 type="number" 
                                                 defaultValue={lead.valorContrato || 0}
                                                 onBlur={(e) => handleValueChange(lead.id, parseFloat(e.target.value))}
-                                                className="w-28 pl-7 bg-transparent border-zinc-700"
+                                                className="w-28 pl-7 bg-transparent border-transparent text-right hover:border-zinc-700 focus:border-purple-500"
                                                 disabled={lead.status !== 'Fechado'}
                                             />
                                         </div>

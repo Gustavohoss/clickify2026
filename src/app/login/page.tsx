@@ -9,6 +9,8 @@ import {
   UserPlus,
   ArrowRight,
   AlertCircle,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +38,7 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -214,12 +217,19 @@ export default function LoginPage() {
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30" />
             <Input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Senha"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="pl-10 bg-black/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-purple-500 focus-visible:border-purple-500"
+              className="pl-10 pr-10 bg-black/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-purple-500 focus-visible:border-purple-500"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30 hover:text-white/50"
+            >
+              {showPassword ? <EyeOff /> : <Eye />}
+            </button>
           </div>
         </div>
 

@@ -1,0 +1,109 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the Noir Canvas application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "displayName",
+        "createdAt"
+      ]
+    },
+    "CanvasSetting": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CanvasSetting",
+      "type": "object",
+      "description": "Represents the settings for the canvas, such as background color.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CanvasSetting entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:1 CanvasSetting).",
+          "format": "uuid"
+        },
+        "backgroundColor": {
+          "type": "string",
+          "description": "The background color of the canvas in hexadecimal format (e.g., #000000 for black)."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "backgroundColor"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. The 'userId' parameter corresponds to the Firebase Auth UID.  This collection stores core user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, corresponding to their Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/canvasSettings/{canvasSettingId}",
+        "definition": {
+          "entityName": "CanvasSetting",
+          "schema": {
+            "$ref": "#/backend/entities/CanvasSetting"
+          },
+          "description": "Stores canvas settings for a specific user. The 'userId' parameter corresponds to the Firebase Auth UID, ensuring that each user's settings are isolated. Implements path-based ownership for user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, corresponding to their Firebase Auth UID."
+            },
+            {
+              "name": "canvasSettingId",
+              "description": "The unique identifier for the canvas setting."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the Noir Canvas application, focusing on user authentication and canvas settings. It prioritizes Authorization Independence by directly associating canvas settings with the user ID, avoiding the need for complex authorization rules or `get()` calls. The structure employs Path-Based Ownership for user data. This approach ensures that each user's canvas settings are isolated and easily manageable, enhancing security and scalability. The segregation of user-specific data into dedicated paths simplifies security rules and facilitates efficient data retrieval and management. This structure supports QAPs, as listing canvas settings is naturally scoped to a user based on the collection structure, preventing unauthorized access."
+  }
+}

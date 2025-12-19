@@ -38,7 +38,7 @@ function Header() {
 
   return (
     <header className="absolute top-0 left-0 right-0 z-20 p-4 md:p-6">
-      <div className="w-full max-w-4xl mx-auto flex justify-between items-center">
+      <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
         <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
           CLICKIFY
         </h1>
@@ -148,7 +148,7 @@ function PainelContent() {
                 >
                   <div className="relative z-10">
                     <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-                      Meus Leads
+                      Gestão de Leads
                     </h2>
                     <p className="text-white/40 mt-2">
                       Gerencie e anote os contatos que você salvou.
@@ -197,3 +197,5 @@ export default function PainelPage() {
         </AuthGuard>
     );
 }
+
+    

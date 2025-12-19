@@ -66,7 +66,16 @@
         "status": {
           "type": "string",
           "description": "Contact status of the lead.",
-          "enum": ["Não contatado", "Contatado", "Convertido", "Descartado"]
+          "enum": ["Novo", "Contatado", "Em Negociação", "Fechado", "Perdido"]
+        },
+        "valorContrato": {
+            "type": "number",
+            "description": "The contract value if the lead is closed."
+        },
+        "ultimaInteracao": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the last interaction with the lead."
         },
         "createdAt": {
           "type": "string",
@@ -74,7 +83,7 @@
           "description": "Timestamp when the lead was saved."
         }
       },
-      "required": ["id", "ownerId", "nome", "status", "createdAt"]
+      "required": ["id", "ownerId", "nome", "status", "createdAt", "ultimaInteracao"]
     }
   },
   "auth": {
@@ -95,3 +104,5 @@
     }
   }
 }
+
+    

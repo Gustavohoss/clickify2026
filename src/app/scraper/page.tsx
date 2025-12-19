@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { useFirebase, useUser } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 type Resultado = {
   nome: string;
@@ -43,6 +44,7 @@ export default function ScraperPage() {
   const [filtrarComSite, setFiltrarComSite] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string[]>([]);
+  const { toast } = useToast();
 
   const { firestore } = useFirebase();
   const { user } = useUser();
@@ -93,13 +95,26 @@ export default function ScraperPage() {
             ...leadData,
             ownerId: user.uid,
             notes: '',
-            status: 'Não contatado',
+            status: 'Novo',
+            valorContrato: 0,
+            ultimaInteracao: serverTimestamp(),
             createdAt: serverTimestamp()
         });
         setSaved(prev => [...prev, leadData.nome]);
+        toast({
+            title: "Lead Salvo!",
+            description: `${leadData.nome} foi adicionado à sua lista.`,
+            variant: "default",
+        })
+
     } catch (err: any) {
         console.error("Erro ao salvar lead:", err);
         setError("Não foi possível salvar o lead. Tente novamente.");
+         toast({
+            title: "Erro ao Salvar",
+            description: "Não foi possível salvar o lead. Tente novamente.",
+            variant: "destructive",
+        })
     } finally {
         setSaving(null);
     }
@@ -293,3 +308,5 @@ export default function ScraperPage() {
     </main>
   );
 }
+
+    

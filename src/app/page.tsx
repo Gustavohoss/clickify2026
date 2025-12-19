@@ -30,7 +30,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              CLICKIFY
+              A forma mais rápida<br />de criar seu SaaS
             </motion.h1>
             <motion.p
               className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto"
@@ -38,7 +38,7 @@ export default function LandingPage() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              Ferramentas inteligentes para impulsionar seus resultados.
+              Conheça a CLICKIFY e crie negócios digitais completos com IA em minutos.
             </motion.p>
             
             <motion.div 

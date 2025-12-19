@@ -7,7 +7,6 @@ import { Footer } from '@/components/ui/footer-section';
 import { Header } from '@/components/landing/header';
 import { GradientButton } from '@/components/ui/gradient-button';
 import Safari_01 from "@/components/ui/safari-01";
-import { SparklesCore } from '@/components/ui/sparkles';
 
 const steps = [
     {
@@ -37,18 +36,6 @@ export default function LandingPage() {
     <div className="bg-black text-white">
       <Header />
       <main className="p-4 md:p-25 pt-40 min-h-screen relative overflow-hidden flex flex-col">
-        <div className="w-full absolute inset-0 h-screen">
-          <SparklesCore
-            id="tsparticlesfullpage"
-            background="transparent"
-            minSize={0.6}
-            maxSize={1.4}
-            particleDensity={100}
-            className="w-full h-full"
-            particleColor="#FFFFFF"
-          />
-        </div>
-
         <div className="w-full max-w-4xl mx-auto relative z-10 text-center flex-grow flex flex-col justify-center">
           <motion.div
             className="relative z-10 space-y-8"

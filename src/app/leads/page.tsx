@@ -1,5 +1,6 @@
 'use client';
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, doc, updateDoc, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
@@ -31,7 +32,8 @@ import {
     DollarSign,
     Users,
     Activity,
-    AlertCircle
+    AlertCircle,
+    ArrowLeft
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -122,10 +124,22 @@ function LeadsContent() {
             </div>
 
             <div className="w-full max-w-7xl mx-auto relative z-10 space-y-8">
+                <div className="absolute top-0 left-0">
+                    <Link href="/painel" passHref>
+                        <Button
+                        variant="ghost"
+                        className="text-white/70 hover:text-white hover:bg-white/10"
+                        >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Voltar ao Painel
+                        </Button>
+                    </Link>
+                </div>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: 'easeOut' }}
+                    className="pt-16"
                 >
                     <div className="flex justify-between items-center mb-8">
                         <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
@@ -312,5 +326,3 @@ export default function LeadsPage() {
         </AuthGuard>
     )
 }
-
-    

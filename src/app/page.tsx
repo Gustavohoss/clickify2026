@@ -56,7 +56,7 @@ export default function LandingPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span>Acessar Painel</span>
+                    <span>Assinar agora</span>
                     <ArrowRight className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
                   </motion.div>
                 </GradientButton>

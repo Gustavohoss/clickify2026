@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail,
   Lock,
+  User,
   LogIn,
   UserPlus,
   ArrowRight,
@@ -17,6 +18,7 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
@@ -34,6 +36,7 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { auth, firestore } = useFirebase();
@@ -43,11 +46,17 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    if (isSignUp && !displayName) {
+        setError('Por favor, preencha seu nome.');
+        setLoading(false);
+        return;
+    }
     if (!email || !password) {
         setError('Por favor, preencha o e-mail e a senha.');
         setLoading(false);
         return;
     }
+
 
     try {
       let userCredential;
@@ -58,10 +67,11 @@ export default function LoginPage() {
           password
         );
         const user = userCredential.user;
+        await updateProfile(user, { displayName });
         await setDoc(doc(firestore, 'users', user.uid), {
             id: user.uid,
             email: user.email,
-            displayName: user.displayName || email.split('@')[0],
+            displayName: displayName,
             createdAt: serverTimestamp(),
         });
 
@@ -124,6 +134,7 @@ export default function LoginPage() {
     setError(null);
     setEmail('');
     setPassword('');
+    setDisplayName('');
   }
 
   return (
@@ -167,6 +178,29 @@ export default function LoginPage() {
         )}
 
         <div className="space-y-4">
+        <AnimatePresence>
+            {isSignUp && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30" />
+                  <Input
+                    type="text"
+                    placeholder="Nome"
+                    value={displayName}
+                    onChange={e => setDisplayName(e.target.value)}
+                    className="pl-10 bg-black/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-purple-500 focus-visible:border-purple-500"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30" />
             <Input

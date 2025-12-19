@@ -24,7 +24,7 @@
           "format": "date-time"
         }
       },
-      "required": ["id", "email", "createdAt"]
+      "required": ["id", "email", "createdAt", "displayName"]
     }
   },
   "auth": {

@@ -12,6 +12,12 @@ service cloud.firestore {
     match /users/{userId} {
       // Allow users to read and write to their own document
       allow read, write: if isOwner(userId);
+
+      // Rules for the 'leads' subcollection
+      match /leads/{leadId} {
+        // Allow users to create, read, update, and delete their own leads
+        allow read, write, delete: if isOwner(userId);
+      }
     }
   }
 }

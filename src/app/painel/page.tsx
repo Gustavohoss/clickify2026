@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, FileText, LogOut, User as UserIcon } from 'lucide-react';
+import { ArrowRight, FileText, LogOut, User as UserIcon, Briefcase } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import AuthGuard from '@/components/auth-guard';
@@ -138,6 +138,27 @@ function PainelContent() {
                     <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                   </div>
                   <div className="absolute top-0 left-0 h-full w-full bg-gradient-to-br from-violet-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </motion.div>
+              </Link>
+              <Link href="/leads" passHref>
+                <motion.div
+                  className="group relative backdrop-blur-xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl p-8 cursor-pointer overflow-hidden"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <div className="relative z-10">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                      Meus Leads
+                    </h2>
+                    <p className="text-white/40 mt-2">
+                      Gerencie e anote os contatos que você salvou.
+                    </p>
+                  </div>
+                  <div className="mt-6 flex items-center justify-end text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                    Acessar Ferramenta
+                    <Briefcase className="ml-2 h-4 w-4 transform group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="absolute top-0 right-0 h-full w-full bg-gradient-to-bl from-green-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </motion.div>
               </Link>
               <Link href="/prompt-builder" passHref>

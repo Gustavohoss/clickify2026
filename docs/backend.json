@@ -25,6 +25,56 @@
         }
       },
       "required": ["id", "email", "createdAt", "displayName"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "type": "object",
+      "description": "Represents a lead captured from the scraper.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the lead."
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "The UID of the user who owns this lead."
+        },
+        "nome": {
+          "type": "string",
+          "description": "Name of the establishment."
+        },
+        "endereco": {
+          "type": "string",
+          "description": "Address of the establishment."
+        },
+        "horario": {
+          "type": "string",
+          "description": "Working hours."
+        },
+        "site": {
+          "type": "string",
+          "description": "Website URL."
+        },
+        "telefone": {
+          "type": "string",
+          "description": "Phone number."
+        },
+        "notes": {
+          "type": "string",
+          "description": "User notes for the lead."
+        },
+        "status": {
+          "type": "string",
+          "description": "Contact status of the lead.",
+          "enum": ["Não contatado", "Contatado", "Convertido", "Descartado"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the lead was saved."
+        }
+      },
+      "required": ["id", "ownerId", "nome", "status", "createdAt"]
     }
   },
   "auth": {
@@ -36,6 +86,12 @@
         "$ref": "#/backend/entities/UserProfile"
       },
       "description": "Stores user profile information. The document ID is the user's Firebase Auth UID."
+    },
+    "/users/{userId}/leads/{leadId}": {
+      "schema": {
+        "$ref": "#/backend/entities/Lead"
+      },
+      "description": "Stores leads saved by a specific user."
     }
   }
 }

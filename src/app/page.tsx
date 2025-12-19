@@ -1,3 +1,4 @@
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -91,7 +92,7 @@ export default function LandingPage() {
                   </motion.div>
                 </GradientButton>
               </Link>
-              <div className="shadow-[0_0_40px_10px_rgba(192,132,252,0.1)] rounded-2xl w-full">
+              <div className="w-full shadow-[0_0_20px_rgba(192,132,252,0.15)] rounded-2xl">
                 <Safari_01 />
               </div>
             </motion.div>
@@ -110,14 +111,14 @@ export default function LandingPage() {
             
             <div className="relative">
               {/* Vertical line */}
-              <div className="absolute left-1/2 -ml-px md:left-auto md:right-1/2 md:ml-0 md:-mr-3.5 w-0.5 h-full bg-gradient-to-b from-purple-500/20 via-purple-500/50 to-purple-500/20"></div>
+              <div className="absolute left-1/2 -ml-px md:left-1/2 md:-ml-0.5 w-0.5 h-full bg-gradient-to-b from-purple-500/0 via-purple-500/50 to-purple-500/0"></div>
 
               <div className="space-y-16">
                 {steps.map((step, index) => (
-                  <div key={step.number} className="relative flex items-start md:even:flex-row-reverse">
+                  <div key={step.number} className="relative flex items-start md:items-center flex-col md:flex-row md:even:flex-row-reverse group">
                     <div className="flex-1 md:pr-12 md:even:pr-0 md:even:pl-12">
                       <motion.div
-                        className="p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm shadow-lg w-full max-w-md ml-auto md:even:ml-0 md:even:mr-auto"
+                        className="p-6 rounded-2xl border border-purple-500/30 bg-black/40 backdrop-blur-sm w-full max-w-md ml-auto md:even:ml-0 md:even:mr-auto shadow-[0_0_20px_rgba(192,132,252,0.15)] transition-all duration-300 md:group-hover:scale-105"
                         initial={{ opacity: 0, x: index % 2 === 0 ? 30 : -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, amount: 0.5 }}
@@ -129,7 +130,7 @@ export default function LandingPage() {
                     </div>
 
                     <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full bg-purple-900/50 border border-purple-500/50 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(192,132,252,0.3)]">
+                        <div className="w-10 h-10 rounded-full bg-purple-900/80 border border-purple-500/50 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(192,132,252,0.4)] transition-all duration-300 md:group-hover:scale-125">
                             {step.number}
                         </div>
                     </div>

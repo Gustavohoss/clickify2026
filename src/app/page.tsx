@@ -57,7 +57,6 @@ export default function LandingPage() {
                     whileTap={{ scale: 0.95 }}
                   >
                     <span>Assinar agora</span>
-                    <ArrowRight className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
                   </motion.div>
                 </GradientButton>
               </Link>

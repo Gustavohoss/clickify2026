@@ -62,7 +62,7 @@ export default function LandingPage() {
                   </motion.div>
                 </GradientButton>
               </Link>
-              <Safari_01 image="https://picsum.photos/seed/1/800/450" />
+              <Safari_01 />
             </motion.div>
           </motion.div>
         </div>

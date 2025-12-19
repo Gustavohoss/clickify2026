@@ -6,16 +6,23 @@ import { Footer } from '@/components/ui/footer-section';
 import { Header } from '@/components/landing/header';
 import { GradientButton } from '@/components/ui/gradient-button';
 import Safari_01 from "@/components/ui/safari-01";
+import { SparklesCore } from '@/components/ui/sparkles';
 
 export default function LandingPage() {
   return (
     <div className="bg-black text-white">
       <Header />
       <main className="p-4 md:p-25 pt-40 min-h-screen relative overflow-hidden flex justify-center">
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
-          <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-fuchsia-500/10 rounded-full mix-blend-normal filter blur-[96px] animate-pulse delay-1000" />
+        <div className="w-full absolute inset-0 h-screen">
+          <SparklesCore
+            id="tsparticlesfullpage"
+            background="transparent"
+            minSize={0.6}
+            maxSize={1.4}
+            particleDensity={100}
+            className="w-full h-full"
+            particleColor="#FFFFFF"
+          />
         </div>
 
         <div className="w-full max-w-4xl mx-auto relative z-10 text-center">

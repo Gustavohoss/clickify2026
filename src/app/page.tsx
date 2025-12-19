@@ -35,7 +35,7 @@ export default function LandingPage() {
   return (
     <div className="bg-black text-white">
       <Header />
-      <main className="p-4 md:p-25 pt-40 min-h-screen relative overflow-hidden flex flex-col items-center">
+      <main className="p-4 md:p-25 pt-40 min-h-screen relative overflow-hidden flex flex-col">
         <div className="w-full absolute inset-0 h-screen">
           <SparklesCore
             id="tsparticlesfullpage"
@@ -48,7 +48,7 @@ export default function LandingPage() {
           />
         </div>
 
-        <div className="w-full max-w-4xl mx-auto relative z-10 text-center">
+        <div className="w-full max-w-4xl mx-auto relative z-10 text-center flex-grow flex flex-col justify-center">
           <motion.div
             className="relative z-10 space-y-8"
             initial={{ opacity: 0, y: 20 }}
@@ -91,7 +91,7 @@ export default function LandingPage() {
                   </motion.div>
                 </GradientButton>
               </Link>
-              <div className="shadow-[0_0_40px_10px_rgba(192,132,252,0.15)] rounded-2xl w-full">
+              <div className="shadow-[0_0_40px_10px_rgba(192,132,252,0.1)] rounded-2xl w-full">
                 <Safari_01 />
               </div>
             </motion.div>
@@ -114,10 +114,10 @@ export default function LandingPage() {
 
               <div className="space-y-16">
                 {steps.map((step, index) => (
-                  <div key={step.number} className="relative flex items-start">
-                    <div className={`flex-1 ${index % 2 === 0 ? 'md:pr-12' : 'md:pl-12 md:text-right'}`}>
+                  <div key={step.number} className="relative flex items-start md:even:flex-row-reverse">
+                    <div className="flex-1 md:pr-12 md:even:pr-0 md:even:pl-12">
                       <motion.div
-                        className={`inline-block p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm shadow-lg w-full max-w-md ${index % 2 === 0 ? 'md:ml-auto' : 'md:mr-auto'}`}
+                        className="p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm shadow-lg w-full max-w-md ml-auto md:even:ml-0 md:even:mr-auto"
                         initial={{ opacity: 0, x: index % 2 === 0 ? 30 : -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, amount: 0.5 }}
@@ -128,13 +128,12 @@ export default function LandingPage() {
                       </motion.div>
                     </div>
 
-                    <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 md:left-auto md:right-1/2 md:translate-x-1/2 flex items-center justify-center">
+                    <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 flex items-center justify-center">
                         <div className="w-10 h-10 rounded-full bg-purple-900/50 border border-purple-500/50 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(192,132,252,0.3)]">
                             {step.number}
                         </div>
                     </div>
-
-                     <div className={`hidden md:block flex-1 ${index % 2 === 0 ? '' : ''}`}>
+                     <div className="hidden md:block flex-1">
                        {/* Empty div for spacing */}
                     </div>
                   </div>

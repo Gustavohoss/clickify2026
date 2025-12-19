@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Footer } from '@/components/ui/footer-section';
 import { Header } from '@/components/landing/header';
 import { GradientButton } from '@/components/ui/gradient-button';
+import Safari_01 from "@/components/ui/safari-01";
 
 export default function LandingPage() {
   return (
@@ -48,6 +49,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
+              className="flex flex-col items-center gap-12"
             >
               <Link href="/login" passHref>
                 <GradientButton variant="variant" asChild>
@@ -60,6 +62,7 @@ export default function LandingPage() {
                   </motion.div>
                 </GradientButton>
               </Link>
+              <Safari_01 image="https://picsum.photos/seed/1/800/450" />
             </motion.div>
           </motion.div>
         </div>

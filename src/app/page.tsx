@@ -25,7 +25,7 @@ export default function BlankPage() {
           minutos.
         </p>
         <div className="mt-8 flex gap-4">
-          <GradientButton>
+          <GradientButton variant="variant">
             Assinar agora
           </GradientButton>
         </div>

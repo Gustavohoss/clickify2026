@@ -588,8 +588,8 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
           </Link>
         </div>
         
-        <div className="text-center mb-12 space-y-2">
-            <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60 pb-2">
+        <div className="text-center my-12 pt-8 space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
                 Construtor de Prompts
             </h1>
             <p className="text-lg text-white/50 max-w-2xl mx-auto">

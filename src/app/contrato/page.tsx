@@ -32,6 +32,7 @@ import {
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { GradientButton } from '@/components/ui/gradient-button';
 
 const steps = [
   { id: '01', name: 'Informações das Partes', icon: Users },
@@ -275,10 +276,11 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
                         <li key={step.name} className="relative">
                         <div className="flex items-center space-x-3">
                             <div
-                            className={cn(`h-10 w-10 rounded-full flex items-center justify-center transition-colors border-2`,
-                                currentStep > index && 'bg-blue-600 border-blue-500 text-white',
-                                currentStep === index && 'border-blue-500 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)]',
-                                currentStep < index && 'bg-zinc-800 border-zinc-700 text-zinc-400'
+                            className={cn(
+                                `h-10 w-10 rounded-full flex items-center justify-center transition-colors`,
+                                currentStep > index && 'text-white gradient-step-icon-completed',
+                                currentStep === index && 'text-white gradient-step-icon shadow-[0_0_15px_rgba(59,130,246,0.5)]',
+                                currentStep < index && 'bg-zinc-800 border border-zinc-700 text-zinc-400'
                             )}
                             >
                             {currentStep > index ? <Check className="w-5 h-5" /> : <step.icon className="w-5 h-5" />}
@@ -319,10 +321,15 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
                         Próximo
                         <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
-                ) : (
-                    <Button onClick={generateContract} className="bg-blue-600 hover:bg-blue-700 text-white">
+                ) : currentStep === steps.length - 2 ? (
+                     <GradientButton onClick={generateContract} className="gradient-button-green">
                         <Sparkles className="w-4 h-4 mr-2" />
                         Gerar Contrato
+                    </GradientButton>
+                ) : (
+                    <Button onClick={() => { /* Lógica para Enviar ou Salvar */ }} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Enviar ou Salvar Contrato
                     </Button>
                 )}
             </div>
@@ -331,3 +338,4 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
   );
 }
 
+    

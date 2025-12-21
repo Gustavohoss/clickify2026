@@ -875,11 +875,9 @@ function ReadyMadeSaaS() {
                     </Accordion>
                     
                     <div className="flex gap-3 pt-2">
-                        <Link href="https://pizza-hot-go.lovable.app" passHref target="_blank">
-                             <Button className="w-full bg-white/10 hover:bg-white/20 text-white py-4">
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                                Ver ao vivo
-                            </Button>
+                         <Link href="https://pizza-hot-go.lovable.app" passHref target="_blank" className="inline-flex items-center justify-center rounded-[11px] px-9 py-4 bg-white/10 hover:bg-white/20 text-white w-full">
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Ver ao vivo
                         </Link>
                         <GradientButton variant="variant" className="w-full">
                             <Sparkles className="w-4 h-4 mr-2" />

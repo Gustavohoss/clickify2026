@@ -880,7 +880,7 @@ function ReadyMadeSaaS() {
                             Ver ao vivo
                         </Link>
                         <GradientButton variant="variant" className="w-full">
-                            <Sparkles className="w-4 h-4 mr-2" />
+                            
                             Usar este modelo
                         </GradientButton>
                     </div>

@@ -41,7 +41,6 @@ import { GradientButton } from '@/components/ui/gradient-button';
 import { cn } from '@/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Safari_01 from '@/components/ui/safari-01';
-import Image from 'next/image';
 
 const steps = [
   { id: '01', name: 'Informações Básicas', icon: FileText },
@@ -890,7 +889,7 @@ function ReadyMadeSaaS() {
                 </div>
                 
                 <div>
-                     <Safari_01 image="https://picsum.photos/seed/pizzasite/800/600" />
+                     <Safari_01 url="https://pizza-hot-go.lovable.app" />
                 </div>
 
             </div>

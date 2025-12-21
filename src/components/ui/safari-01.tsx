@@ -1,16 +1,14 @@
 "use client"
 
-import Image, { StaticImageData } from "next/image"
 import React from "react"
 import { cn } from "@/lib/utils"
 
 interface Safari_01Props {
-  image?: StaticImageData | string
+  url?: string
   className?: string
 }
 
-
-const Safari_01: React.FC<Safari_01Props> = ({ image, className }) => {
+const Safari_01: React.FC<Safari_01Props> = ({ url, className }) => {
   return (
     <div
       className={cn(
@@ -31,17 +29,15 @@ const Safari_01: React.FC<Safari_01Props> = ({ image, className }) => {
 
       {/* Preview area */}
       <div className="bg-gray-100 dark:bg-zinc-800 aspect-video flex items-center justify-center">
-        {image ? (
-          <Image
-            src={image}
-            alt="Preview"
-            width={800}
-            height={450}
-            className="object-contain max-h-full max-w-full"
+        {url ? (
+          <iframe
+            src={url}
+            title="Website Preview"
+            className="w-full h-full border-0"
           />
         ) : (
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            No preview image
+            No preview URL
           </div>
         )}
       </div>

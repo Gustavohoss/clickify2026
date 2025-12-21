@@ -8,6 +8,7 @@ import {
   Pizza,
   Copy,
   ExternalLink,
+  Scissors,
 } from 'lucide-react';
 import Link from 'next/link';
 import { GradientButton } from '@/components/ui/gradient-button';
@@ -180,13 +181,278 @@ WhatsApp: Vou informar depois
 Implementar o plano do PizzaZap com homepage completa (hero + combos + informações), cardápio com pizzas de exemplo e integração WhatsApp
 `;
 
-export default function ReadyMadeSaaS() {
-    const [promptCopied, setPromptCopied] = useState(false);
+const barbeariaKingPrompt = `💡 Lovable App Prompt: Barbearia King 🎯 Mission Statement
 
-    const handleCopyPrompt = () => {
-        navigator.clipboard.writeText(pizzaZapPrompt);
-        setPromptCopied(true);
-        setTimeout(() => setPromptCopied(false), 2000);
+Quero construir um site completo de barbearia premium onde o foco principal seja mostrar a qualidade do trabalho e a experiência dos barbeiros, criando confiança antes do agendamento. O site deve permitir agendamento online simples, escolhendo barbeiro, dia e horário, de segunda a sábado, mas sem parecer um sistema frio — e sim uma marca forte.
+
+A sensação principal deve ser: “Essa barbearia é séria, estilosa e sabe exatamente o que está fazendo.”
+
+🏷️ Project Name
+
+Barbearia King
+
+👥 Target Audience
+
+Homens de 16–45 anos que valorizam aparência e estilo
+
+Clientes que querem confiar o visual a profissionais experientes
+
+Pessoas que usam o celular como principal meio de agendamento
+
+Clientes recorrentes que não querem perder tempo com mensagens
+
+🧩 Core Features & Pages 🏠 Homepage (Página Principal — Muito Importante) ✅ Hero Section (Impacto Inicial)
+
+Tela cheia (full screen)
+
+Imagem ou vídeo curto:
+
+Barbeiro trabalhando
+
+Detalhes de acabamento, máquina, navalha
+
+Overlay escuro e elegante
+
+Headline forte:
+
+“Estilo se constrói no detalhe.”
+
+Subheadline curta:
+
+“Barbeiros experientes. Cortes precisos.”
+
+CTA principal destacado: “Agendar horário”
+
+👉 Aqui o objetivo é atmosfera e marca, não explicação.
+
+✅ Seção “Nosso Trabalho” — Portfólio em Grid Fixo
+
+(Escolha confirmada: GRID FIXO)
+
+Grid organizado de fotos reais dos cortes
+
+3 ou 4 colunas no desktop
+
+1 coluna no mobile (scroll natural)
+
+Fotos grandes, bem enquadradas, estilo editorial
+
+Nenhum botão de ação direta
+
+Interação:
+
+Hover sutil:
+
+Leve zoom
+
+Escurecimento discreto
+
+Legenda curta opcional:
+
+“Acabamento preciso • Degradê clássico”
+
+👉 Função da seção: mostrar consistência, qualidade e padrão profissional O cliente não escolhe — ele confia.
+
+✅ Seção “Nossos Barbeiros”
+
+Humaniza e reforça autoridade.
+
+Cards de barbeiro:
+
+Foto profissional do barbeiro
+
+Nome em destaque
+
+Especialidade
+
+Descrição curta (1–2 linhas), exemplo:
+
+“Especialista em degradê e barba. Mais de 6 anos de experiência.”
+
+Interação:
+
+Hover com leve destaque
+
+Visual premium, sem exageros
+
+👉 CTA por barbeiro: “Agendar com este barbeiro”
+
+✅ Seção “Nossa Experiência”
+
+Curta, direta e emocional.
+
+Ícones minimalistas + texto curto:
+
+✂️ “Precisão em cada detalhe”
+
+🕒 “Horário marcado, sem espera”
+
+💈 “Ambiente urbano e profissional”
+
+✅ CTA Final (Conversão)
+
+Fundo escuro sólido
+
+Headline:
+
+“Confiança se constrói com o tempo. Estilo também.”
+
+Botão grande: “Agendar horário agora”
+
+📅 Página de Agendamento Fluxo em Etapas Claras:
+
+Escolher barbeiro
+
+Escolher dia (segunda a sábado)
+
+Escolher horário disponível
+
+Horários ocupados bloqueados
+
+Feedback visual imediato
+
+CTA final: “Confirmar agendamento”
+
+✅ Confirmação
+
+Resumo:
+
+Barbeiro
+
+Data
+
+Horário
+
+Mensagem:
+
+“Horário confirmado. Te esperamos.”
+
+Opções:
+
+Cancelar
+
+Reagendar
+
+🧠 Tech Stack
+
+Frontend: Vite + TypeScript + React + shadcn/ui + Tailwind CSS
+
+Backend & Storage: Lovable Cloud
+
+Barbeiros
+
+Agenda
+
+Horários
+
+Fotos do portfólio
+
+Auth:
+
+Cliente: simples (nome + telefone)
+
+Admin: painel interno da barbearia
+
+🎨 Design Guidelines (baseado em design-tips.md) → Emotional Thesis
+
+“Parece um estúdio masculino urbano — escuro, preciso, silencioso e confiante.”
+
+→ Typography
+
+Headings: Sans-serif condensada, forte
+
+Body: Sans-serif limpa
+
+Pouco texto, frases diretas
+
+Hierarquia clara (H1–H4)
+
+→ Color System
+
+Preto carvão #0F0F0F
+
+Cinza grafite #1C1C1C
+
+Accent dourado queimado ou verde escuro
+
+Texto branco suave #F2F2F2
+
+Contraste WCAG AA+
+
+→ Layout & Spacing
+
+Grid 8pt
+
+Muito respiro visual
+
+Layout organizado
+
+Mobile-first
+
+→ Motion & Interactions
+
+Fade-in suave ao scroll
+
+Hover elegante nas imagens
+
+Transições de 200–300ms
+
+Nada chamativo — tudo profissional
+
+→ Accessibility
+
+Navegação por teclado
+
+Estados de foco visíveis
+
+Botões grandes e claros
+
+Estrutura semântica correta
+
+🤖 Optional AI Feature (Futuro)
+
+Sugestão de barbeiro baseada em horários disponíveis
+
+Personalidade: atendente experiente, direto e profissional
+
+✅ Design Integrity Review
+
+A homepage parece uma vitrine de marca forte?
+
+O portfólio passa confiança sem precisar explicar?
+
+Os barbeiros parecem profissionais de alto nível?
+
+O agendamento é simples e rápido?
+
+💈 Final Reflection
+
+Este site não tenta convencer. Ele mostra o trabalho — e isso é o suficiente.
+
+O cliente entra, vê o nível e pensa: “É aqui que eu vou cortar.”
+
+Equipe: 2 barbeiros
+Serviços: Vários serviços
+Preços: Sim, visíveis
+Confirmação: Direcionar para WhatsApp
+
+Sobre os serviços: corte masculino, barba, sobrancelha, hidratação, combo corte+barba, etc.)
+
+Sobre horários: 10h às 20h
+
+Sobre as fotos: começamos com placeholders
+
+Implementar o plano, mas adicionar seção de localização com mapa e horário de funcionamento
+`;
+
+export default function ReadyMadeSaaS() {
+    const [pizzaPromptCopied, setPizzaPromptCopied] = useState(false);
+    const [barberPromptCopied, setBarberPromptCopied] = useState(false);
+
+    const handleCopyPrompt = (promptText: string, setCopied: (value: boolean) => void) => {
+        navigator.clipboard.writeText(promptText);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
   return (
@@ -200,60 +466,119 @@ export default function ReadyMadeSaaS() {
             </p>
         </div>
 
-        <div className="backdrop-blur-xl bg-white/[0.02] rounded-2xl border border-zinc-800 shadow-2xl p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-center">
-                            <Pizza className="w-6 h-6 text-red-400" />
+        <div className="space-y-12">
+            {/* PizzaZap Card */}
+            <div className="backdrop-blur-xl bg-white/[0.02] rounded-2xl border border-zinc-800 shadow-2xl p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-center">
+                                <Pizza className="w-6 h-6 text-red-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white">PizzaZap</h3>
+                                <p className="text-sm text-zinc-400">Site de delivery para pizzarias com pedido via WhatsApp.</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-white">PizzaZap</h3>
-                            <p className="text-sm text-zinc-400">Site de delivery para pizzarias com pedido via WhatsApp.</p>
+                        <div className="text-sm text-zinc-300 space-y-1">
+                            <p><span className="font-semibold text-zinc-400">Tecnologias:</span> React, TypeScript, TailwindCSS</p>
+                            <p><span className="font-semibold text-zinc-400">Foco:</span> Mobile-first, conversão rápida.</p>
                         </div>
-                    </div>
-                    <div className="text-sm text-zinc-300 space-y-1">
-                        <p><span className="font-semibold text-zinc-400">Tecnologias:</span> React, TypeScript, TailwindCSS</p>
-                        <p><span className="font-semibold text-zinc-400">Foco:</span> Mobile-first, conversão rápida.</p>
-                    </div>
 
-                    <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="item-1" className="border-zinc-800">
-                            <AccordionTrigger className="text-sm text-purple-400 hover:text-purple-300 hover:no-underline">Mostrar Prompt Usado</AccordionTrigger>
-                            <AccordionContent>
-                                <div className="relative">
-                                    <pre className="w-full bg-zinc-900/50 p-4 rounded-lg text-white/70 text-xs overflow-x-auto whitespace-pre-wrap font-mono h-64">
-                                        {pizzaZapPrompt}
-                                    </pre>
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={handleCopyPrompt}
-                                        className="absolute top-2 right-2 text-zinc-400 hover:text-white hover:bg-zinc-700"
-                                    >
-                                        {promptCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                    </Button>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="item-1" className="border-zinc-800">
+                                <AccordionTrigger className="text-sm text-purple-400 hover:text-purple-300 hover:no-underline">Mostrar Prompt Usado</AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="relative">
+                                        <pre className="w-full bg-zinc-900/50 p-4 rounded-lg text-white/70 text-xs overflow-x-auto whitespace-pre-wrap font-mono h-64">
+                                            {pizzaZapPrompt}
+                                        </pre>
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => handleCopyPrompt(pizzaZapPrompt, setPizzaPromptCopied)}
+                                            className="absolute top-2 right-2 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                                        >
+                                            {pizzaPromptCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                        </Button>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                        
+                        <div className="flex gap-3 pt-2">
+                             <Link href="https://pizza-hot-go.lovable.app" passHref target="_blank" className="inline-flex items-center justify-center rounded-[11px] px-9 py-4 bg-white/10 hover:bg-white/20 text-white w-full">
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                Ver ao vivo
+                            </Link>
+                            <GradientButton variant="variant" className="w-full">
+                                Usar este modelo
+                            </GradientButton>
+                        </div>
+                    </div>
                     
-                    <div className="flex gap-3 pt-2">
-                         <Link href="https://pizza-hot-go.lovable.app" passHref target="_blank" className="inline-flex items-center justify-center rounded-[11px] px-9 py-4 bg-white/10 hover:bg-white/20 text-white w-full">
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Ver ao vivo
-                        </Link>
-                        <GradientButton variant="variant" className="w-full">
-                            
-                            Usar este modelo
-                        </GradientButton>
+                    <div>
+                         <Safari_01 url="https://pizza-hot-go.lovable.app" />
                     </div>
-                </div>
-                
-                <div>
-                     <Safari_01 url="https://pizza-hot-go.lovable.app" />
-                </div>
 
+                </div>
+            </div>
+
+            {/* Barbearia King Card */}
+            <div className="backdrop-blur-xl bg-white/[0.02] rounded-2xl border border-zinc-800 shadow-2xl p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-center justify-center">
+                                <Scissors className="w-6 h-6 text-amber-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white">Barbearia King</h3>
+                                <p className="text-sm text-zinc-400">Site premium para barbearia com agendamento online.</p>
+                            </div>
+                        </div>
+                        <div className="text-sm text-zinc-300 space-y-1">
+                            <p><span className="font-semibold text-zinc-400">Tecnologias:</span> React, TypeScript, TailwindCSS</p>
+                            <p><span className="font-semibold text-zinc-400">Foco:</span> Marca forte, experiência premium.</p>
+                        </div>
+
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="item-1" className="border-zinc-800">
+                                <AccordionTrigger className="text-sm text-purple-400 hover:text-purple-300 hover:no-underline">Mostrar Prompt Usado</AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="relative">
+                                        <pre className="w-full bg-zinc-900/50 p-4 rounded-lg text-white/70 text-xs overflow-x-auto whitespace-pre-wrap font-mono h-64">
+                                            {barbeariaKingPrompt}
+                                        </pre>
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => handleCopyPrompt(barbeariaKingPrompt, setBarberPromptCopied)}
+                                            className="absolute top-2 right-2 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                                        >
+                                            {barberPromptCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                        </Button>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                        
+                        <div className="flex gap-3 pt-2">
+                             <Link href="https://king-cut-book.lovable.app" passHref target="_blank" className="inline-flex items-center justify-center rounded-[11px] px-9 py-4 bg-white/10 hover:bg-white/20 text-white w-full">
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                Ver ao vivo
+                            </Link>
+                            <GradientButton variant="variant" className="w-full">
+                                Usar este modelo
+                            </GradientButton>
+                        </div>
+                    </div>
+                    
+                    <div>
+                         <Safari_01 url="https://king-cut-book.lovable.app" />
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

@@ -13,7 +13,7 @@ const getRandomCommission = () => {
 const notificationTypes = [
   {
     type: 'sale',
-    icon: 'https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmi0sldz2000djl043bd6dtvj/blocks/e8vsn1pelzr1o22gyvomkn6l?v=1763544631191',
+    icon: 'https://s3.typebot.io/public/workspaces/cmj62bxvv000fju04wwudfwgk/typebots/cmjclddjn000kl204sjzbusjb/blocks/fsaq4r55w8wjex0s3bcg4jp4?v=1766387734197',
     title: 'Venda Realizada',
     description: (commission: string) => `Sua comissão: R$ ${commission}`,
   },

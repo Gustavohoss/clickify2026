@@ -66,9 +66,9 @@ export default function WhyChooseUs() {
     <section className="relative bg-background py-20 sm:py-28">
       <div className="absolute inset-0 -z-10 h-full w-full bg-[radial-gradient(theme(colors.primary/0.1)_1px,transparent_1px)] [background-size:32px_32px]" />
       <div className="absolute inset-0 -z-20 bg-background" />
-      <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-black to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-black to-transparent -z-10" />
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative z-10">
         <div className="mx-auto mb-16 max-w-2xl text-center">
           <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Por que escolher a{' '}

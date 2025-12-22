@@ -1,10 +1,12 @@
+
 'use client';
 
 import FallingNotifications from './falling-notifications';
 
 const SocialProof = () => {
   return (
-    <section className="py-1 bg-background text-center">
+    <section className="py-1 bg-background text-center relative">
+       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
       <div className="container mx-auto px-1">
         <h1 className="md:text-5xl text-3xl lg:text-6xl text-white font-body">
             <span className="text-primary">Venda todos os dias</span> com os nossos metodos e <span className="text-primary">video aulas exclusivos</span>

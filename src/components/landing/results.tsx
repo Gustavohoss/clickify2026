@@ -1,3 +1,4 @@
+
 'use client';
 
 import { TrendingUp, Users } from 'lucide-react';
@@ -6,7 +7,7 @@ import { BGPattern } from '@/components/ui/bg-pattern';
 import { ResultsLogo } from './results-logo';
 
 const MetricCard = ({ icon, value, label }: { icon: React.ReactNode, value: string, label: string }) => (
-    <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/30 p-6 shadow-2xl shadow-primary/10 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:shadow-primary/20">
+    <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/30 p-6 shadow-2xl shadow-primary/10 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:shadow-primary/20 w-full max-w-xs">
          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <div className="relative">
             <div className="mb-4 text-primary">
@@ -26,36 +27,31 @@ export default function Results() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-background" />
 
         <div className="container mx-auto px-4 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div className="flex justify-center lg:justify-start">
-                    <ResultsLogo />
-                </div>
-
-                <div>
-                    <div className="mb-12 text-center lg:text-left">
-                        <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                           Nossos <span className="bg-gradient-to-br from-primary to-purple-400 bg-clip-text text-transparent">Resultados</span>
-                        </h2>
-                        <p className="mt-4 text-lg text-neutral-400">
-                            Veja alguns de nossos números.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <MetricCard 
-                            icon={<TrendingUp className="w-8 h-8" />}
-                            value="+3.961"
-                            label="SaaS desenvolvidos pela CLICKIFY IA"
-                        />
-                        <MetricCard 
-                            icon={<Users className="w-8 h-8" />}
-                            value="+R$932K"
-                            label="Faturados mensalmente por usuários"
-                        />
-                    </div>
+            <div className="mb-16 text-center">
+                <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                   Nossos <span className="bg-gradient-to-br from-primary to-purple-400 bg-clip-text text-transparent">Resultados</span>
+                </h2>
+                <p className="mt-4 text-lg text-neutral-400">
+                    Veja alguns de nossos números.
+                </p>
+            </div>
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
+                <ResultsLogo />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <MetricCard 
+                        icon={<TrendingUp className="w-8 h-8" />}
+                        value="+3.961"
+                        label="SaaS desenvolvidos pela CLICKIFY IA"
+                    />
+                    <MetricCard 
+                        icon={<Users className="w-8 h-8" />}
+                        value="+R$932K"
+                        label="Faturados mensalmente por usuários"
+                    />
                 </div>
             </div>
         </div>
     </section>
   );
 }
+

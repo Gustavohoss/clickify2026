@@ -38,7 +38,7 @@ const HowItWorks = () => {
             
             <div className="container mx-auto px-4 relative z-10">
                 <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-4xl md:text-5xl text-white font-body">
+                    <h2 className="text-4xl md:text-5xl text-white font-body text-center">
                         Com a <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">CLICKIFY</span>, desenvolver um SaaS é fácil, ágil e eficiente:
                     </h2>
                 </div>
@@ -52,7 +52,7 @@ const HowItWorks = () => {
                             <div key={index} className="relative flex items-center md:items-start flex-col md:flex-row">
                                 {/* Card */}
                                 <div className={`w-full md:w-5/12 ${step.align === 'left' ? 'md:pr-8' : 'md:pl-8'} ${step.align === 'right' ? 'md:ml-auto' : ''}`}>
-                                    <div className="bg-background/50 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 shadow-lg shadow-purple-500/10">
+                                    <div className="bg-background/50 backdrop-blur-sm border border-purple-500/20 rounded-lg p-6 shadow-lg shadow-purple-500/10">
                                         <h3 className="font-bold text-purple-400 text-xl mb-2">{step.title}</h3>
                                         <p className="text-neutral-300">{step.description}</p>
                                     </div>

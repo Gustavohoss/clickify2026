@@ -48,30 +48,31 @@ const HowItWorks = () => {
                     {/* Vertical line */}
                     <div className="absolute left-1/2 top-5 bottom-5 w-0.5 bg-gradient-to-b from-transparent via-purple-500 to-transparent -translate-x-1/2 hidden md:block"></div>
 
-                    <div className="space-y-16 md:space-y-24">
+                    <div className="space-y-16 md:space-y-0 md:grid md:gap-y-24">
                         {steps.map((step, index) => (
-                            <div key={index} className="relative flex items-center md:items-start flex-col md:flex-row md:justify-between">
+                            <div key={index} className="relative md:grid md:grid-cols-2 md:items-center md:gap-x-8">
+                               
                                 {/* Card */}
-                                <div className={`w-full md:w-5/12 ${step.align === 'left' ? 'md:pr-8 text-left' : 'md:pl-8 text-left md:order-last'}`}>
+                                <div className={`relative ${step.align === 'right' ? 'md:col-start-2' : 'md:col-start-1'}`}>
+                                     {/* Number Circle for Mobile */}
+                                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-[0_0_12px_theme(colors.purple.500/0.7)] ring-1 ring-purple-500/50 md:hidden absolute -top-4 left-4 z-10">
+                                        {step.number}
+                                    </div>
                                     <div className="bg-zinc-900/50 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6 [filter:drop-shadow(0_0_8px_hsl(var(--primary)/0.2))]">
                                         <h3 className="font-bold text-purple-400 text-xl mb-2">{step.title}</h3>
                                         <p className="text-neutral-300">{step.description}</p>
                                     </div>
                                 </div>
                                 
-                                {/* Number Circle for Desktop */}
+                                {/* Number Circle and Connector for Desktop */}
                                 <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center`}>
                                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-[0_0_12px_theme(colors.purple.500/0.5)] ring-1 ring-purple-500/30 relative">
                                         {step.number}
-                                         {/* Horizontal connecting line */}
+                                        {/* Horizontal connecting line */}
                                         <div className={`absolute h-px bg-purple-500/30 w-8 ${step.align === 'left' ? 'right-full' : 'left-full'}`}></div>
                                     </div>
                                 </div>
 
-                                 {/* Number Circle for Mobile */}
-                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-[0_0_12px_theme(colors.purple.500/0.7)] ring-1 ring-purple-500/50 md:hidden absolute -top-4 left-4">
-                                    {step.number}
-                                </div>
                             </div>
                         ))}
                     </div>

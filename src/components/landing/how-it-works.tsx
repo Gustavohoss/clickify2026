@@ -52,8 +52,8 @@ const HowItWorks = () => {
                         {steps.map((step, index) => (
                             <div key={index} className="relative flex items-center md:items-start flex-col md:flex-row">
                                 {/* Card */}
-                                <div className={`w-full md:w-5/12 ${step.align === 'left' ? 'md:pr-8' : 'md:pl-8'} ${step.align === 'right' ? 'md:ml-auto' : ''}`}>
-                                    <div className="bg-zinc-900/50 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6 [filter:drop-shadow(0_0_8px_hsl(var(--primary)/0.2))] text-left">
+                                <div className={`w-full md:w-5/12 ${step.align === 'left' ? 'md:pr-8 text-left' : 'md:pl-8 text-left md:ml-auto md:text-right'}`}>
+                                    <div className="bg-zinc-900/50 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6 [filter:drop-shadow(0_0_8px_hsl(var(--primary)/0.2))]">
                                         <h3 className="font-bold text-purple-400 text-xl mb-2">{step.title}</h3>
                                         <p className="text-neutral-300">{step.description}</p>
                                     </div>

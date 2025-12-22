@@ -1,3 +1,4 @@
+
 'use client'
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -46,7 +47,7 @@ export const GradientCard: React.FC<GradientCardProps> = ({ title, description, 
         ref={cardRef}
         className="relative rounded-[32px] overflow-hidden w-full"
         style={{
-          height: "350px",
+          height: "280px",
           transformStyle: "preserve-3d",
           backgroundColor: "#0e131f",
           boxShadow: "0 -10px 100px 10px rgba(78, 99, 255, 0.25), 0 0 10px 0 rgba(0, 0, 0, 0.5)",
@@ -320,7 +321,7 @@ export const GradientCard: React.FC<GradientCardProps> = ({ title, description, 
             }}
           >
             <motion.h3
-              className="text-2xl font-medium text-white mb-3"
+              className="text-xl font-medium text-white mb-2"
               style={{
                 letterSpacing: "-0.01em",
                 lineHeight: 1.2,
@@ -337,7 +338,7 @@ export const GradientCard: React.FC<GradientCardProps> = ({ title, description, 
             </motion.h3>
 
             <motion.p
-              className="text-sm mb-6 text-gray-300"
+              className="text-sm mb-4 text-gray-300"
               style={{
                 lineHeight: 1.5,
                 fontWeight: 350,

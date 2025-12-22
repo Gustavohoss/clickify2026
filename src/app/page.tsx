@@ -9,7 +9,6 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { BGPattern } from "@/components/ui/bg-pattern"; 
 import { Header } from "@/components/landing/header";
 import SocialProof from "@/components/landing/social-proof";
-import { LessonsCarousel } from "@/components/landing/lessons-carousel";
 import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button-glow"; 
@@ -119,7 +118,6 @@ export default function Home() {
       </div>
 
       <SocialProof />
-      <LessonsCarousel />
       <HowItWorks />
 
       <section className="relative py-20 pb-32 text-center overflow-hidden">

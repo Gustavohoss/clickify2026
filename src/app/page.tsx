@@ -21,9 +21,8 @@ export default function BlankPage() {
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white/90 to-white/40 leading-tight">
           A forma mais rápida de
           <br />
-          criar seu{' '}
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-violet-500">
-            SaaS
+            criar seu SaaS
           </span>
         </h1>
         <p className="mt-6 text-lg text-white/60 max-w-xl">
@@ -38,10 +37,9 @@ export default function BlankPage() {
           </Link>
         </div>
         <div className="mt-20 w-full">
-          <Safari_01 className="w-full max-w-4xl mx-auto" />
+          <Safari_01 url="https://pizza-hot-go.lovable.app" />
         </div>
       </div>
-      <div className="h-[100vh]"></div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { BarChart, Bot, Brush, Sparkles, Zap, Settings } from 'lucide-react';
 import React, { Suspense } from 'react';
 import { SplineScene } from '@/components/ui/spline';
 import { Spotlight } from '@/components/ui/spotlight';
+import { Button } from '@/components/ui/button';
 
 const features = [
   {
@@ -22,7 +23,7 @@ const features = [
   },
   {
     title: 'Atualizações com 1 clique',
-    description: 'Modifique e evolua seus projetos existentes sem complicação',
+    description: 'Modifique e evolua seus projetos existentes sem complicação.',
     content: (
         <div className="w-full h-full bg-black relative flex items-center justify-center p-4">
             <div className="w-full max-w-xs space-y-4">
@@ -35,6 +36,26 @@ const features = [
                 </div>
             </div>
         </div>
+    ),
+    spotlightFill: '#a855f7',
+  },
+    {
+    title: 'Visual Personalizado',
+    description: 'Escolha cores, fontes e estilos para o seu projeto.',
+    content: (
+      <div className="w-full h-full bg-black relative flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-sm rounded-xl border border-purple-500/20 bg-purple-900/10 p-4 shadow-inner shadow-purple-900/50">
+            <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="h-4 w-4 text-purple-400"/>
+                <p className="text-sm font-medium text-white">Qual estilo visual deseja aplicar?</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+                <Button variant="ghost" className="h-9 text-xs bg-black/20 hover:bg-black/40 text-neutral-300">Futurista</Button>
+                <Button variant="outline" className="h-9 text-xs border-purple-400 bg-purple-500/10 text-white shadow-[0_0_10px_theme(colors.purple.400)]">Minimalista</Button>
+                <Button variant="ghost" className="h-9 text-xs bg-black/20 hover:bg-black/40 text-neutral-300">Dark Mode</Button>
+            </div>
+        </div>
+      </div>
     ),
     spotlightFill: '#a855f7',
   },

@@ -39,7 +39,7 @@ const HowItWorks = () => {
             
             <div className="container mx-auto px-4 relative z-10">
                 <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-4xl md:text-5xl text-white font-body">
+                     <h2 className="text-4xl md:text-5xl text-white font-body text-center">
                         Com a <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">CLICKIFY</span>, desenvolver um SaaS é fácil, ágil e eficiente:
                     </h2>
                 </div>
@@ -50,22 +50,22 @@ const HowItWorks = () => {
 
                     <div className="space-y-16 md:space-y-24">
                         {steps.map((step, index) => (
-                            <div key={index} className="relative flex items-center md:items-start flex-col md:flex-row">
+                            <div key={index} className="relative flex items-center md:items-start flex-col md:flex-row md:justify-between">
                                 {/* Card */}
-                                <div className={`w-full md:w-5/12 ${step.align === 'left' ? 'md:pr-8 text-left' : 'md:pl-8 text-left md:ml-auto md:text-right'}`}>
+                                <div className={`w-full md:w-5/12 ${step.align === 'left' ? 'md:pr-8 text-left' : 'md:pl-8 text-left md:order-last'}`}>
                                     <div className="bg-zinc-900/50 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6 [filter:drop-shadow(0_0_8px_hsl(var(--primary)/0.2))]">
                                         <h3 className="font-bold text-purple-400 text-xl mb-2">{step.title}</h3>
                                         <p className="text-neutral-300">{step.description}</p>
                                     </div>
                                 </div>
                                 
-                                {/* Number Circle and Horizontal Line for Desktop */}
-                                <div className={`absolute top-1/2 -translate-y-1/2 hidden md:flex items-center w-auto ${step.align === 'left' ? 'right-1/2 translate-x-full' : 'left-1/2 -translate-x-full'}`}>
-                                   {step.align === 'right' && <div className="w-8 h-px bg-purple-500/30"></div> }
-                                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-[0_0_12px_theme(colors.purple.500/0.5)] ring-1 ring-purple-500/30">
+                                {/* Number Circle for Desktop */}
+                                <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center`}>
+                                   <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-[0_0_12px_theme(colors.purple.500/0.5)] ring-1 ring-purple-500/30 relative">
                                         {step.number}
+                                         {/* Horizontal connecting line */}
+                                        <div className={`absolute h-px bg-purple-500/30 w-8 ${step.align === 'left' ? 'right-full' : 'left-full'}`}></div>
                                     </div>
-                                    {step.align === 'left' && <div className="w-8 h-px bg-purple-500/30"></div> }
                                 </div>
 
                                  {/* Number Circle for Mobile */}

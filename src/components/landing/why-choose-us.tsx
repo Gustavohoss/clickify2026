@@ -1,7 +1,7 @@
 
 'use client';
 
-import { BarChart, Bot, Brush, Zap } from 'lucide-react';
+import { BarChart, Bot, Brush, Sparkles, Zap } from 'lucide-react';
 import React from 'react';
 
 const features = [
@@ -37,11 +37,14 @@ const features = [
     icon: <Brush className="w-8 h-8 text-primary" />,
     content: (
         <div className="flex h-full w-full flex-col items-start justify-center p-4 text-left gap-4">
-            <p className="text-sm text-white/80">Qual estilo visual deseja aplicar ao seu SaaS?</p>
+            <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <p className="text-sm text-white/80">Qual estilo visual deseja aplicar ao seu SaaS?</p>
+            </div>
             <div className="flex gap-2">
-                <button className="rounded-md bg-white/10 px-3 py-1.5 text-xs text-white/80 transition-colors hover:bg-white/20">Futurista</button>
-                <button className="rounded-md bg-white/10 px-3 py-1.5 text-xs text-white/80 transition-colors hover:bg-white/20">Minimalista</button>
-                <button className="rounded-md bg-primary/20 px-3 py-1.5 text-xs text-primary ring-1 ring-primary/50 transition-colors hover:bg-primary/30">Dark Mode</button>
+                <button className="rounded-md bg-background/50 border border-white/10 px-3 py-1.5 text-xs text-white/60 transition-colors hover:bg-white/10 hover:text-white">Futurista</button>
+                <button className="rounded-md bg-background/50 border border-white/10 px-3 py-1.5 text-xs text-white/60 transition-colors hover:bg-white/10 hover:text-white">Minimalista</button>
+                <button className="rounded-md bg-primary/20 border border-primary/50 px-3 py-1.5 text-xs text-primary transition-colors hover:bg-primary/30">Dark Mode</button>
             </div>
       </div>
     ),
@@ -89,7 +92,7 @@ export default function WhyChooseUs() {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <div className="relative">
-                <div className="mb-4 flex h-16 w-full items-center justify-center rounded-lg border border-primary/20 bg-primary/10">
+                <div className="mb-4 flex h-24 w-full items-center justify-center rounded-lg border border-primary/20 bg-primary/10">
                     {feature.content}
                 </div>
                 <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
@@ -102,4 +105,3 @@ export default function WhyChooseUs() {
     </section>
   );
 }
-

@@ -4,6 +4,7 @@
 import { BGPattern } from "@/components/ui/bg-pattern";
 import { GradientCard } from "@/components/ui/gradient-card";
 import { Briefcase, Code, Pencil, UploadCloud } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const steps = [
     {
@@ -61,7 +62,7 @@ const HowItWorks = () => {
                                 {/* Card */}
                                 <div className={`relative ${step.align === 'right' ? 'md:col-start-2' : 'md:col-start-1'}`}>
                                      {/* Number Circle for Mobile */}
-                                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-[0_0_12px_theme(colors.purple.500/0.7)] ring-1 ring-purple-500/50 md:hidden absolute -top-4 left-4 z-10">
+                                     <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-primary-foreground font-bold md:hidden absolute -top-4 left-4 z-10", "gradient-step-icon")}>
                                         {step.number}
                                     </div>
                                     <GradientCard 
@@ -73,7 +74,7 @@ const HowItWorks = () => {
                                 
                                 {/* Number Circle and Connector for Desktop */}
                                 <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center`}>
-                                   <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-[0_0_12px_theme(colors.purple.500/0.5)] ring-1 ring-purple-500/30 relative">
+                                   <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-primary-foreground font-bold relative", "gradient-step-icon")}>
                                         {step.number}
                                         {/* Horizontal connecting line */}
                                         <div className={`absolute h-px bg-purple-500/30 w-8 ${step.align === 'left' ? 'right-full' : 'left-full'}`}></div>

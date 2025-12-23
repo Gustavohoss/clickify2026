@@ -193,7 +193,7 @@ export default function Home() {
                 </div>
                 
                 {/* Plano Trimestral */}
-                <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/80 bg-background/50 p-6 shadow-2xl shadow-primary/20 text-left">
+                <div className="group relative rounded-2xl border-2 border-primary/80 bg-background/50 p-6 shadow-2xl shadow-primary/20 text-left">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-sm font-semibold text-primary-foreground">
                         MAIS POPULAR
                     </div>

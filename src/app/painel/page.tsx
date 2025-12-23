@@ -119,24 +119,30 @@ function PainelContent() {
             </div>
             
             <motion.div 
-              className="flex items-center gap-6 text-sm text-zinc-400 border border-zinc-800/80 rounded-lg p-3 bg-zinc-900/20 backdrop-blur-sm"
+              className="group relative p-3 rounded-2xl overflow-hidden bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 cursor-pointer"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-base">🔥</span>
-                <span><span className="font-bold text-white">2</span> Leads capturados hoje</span>
-              </div>
-               <div className="h-4 w-px bg-zinc-700"></div>
-               <div className="flex items-center gap-2">
-                <span className="text-base">⚡</span>
-                <span>Último uso: <span className="font-bold text-white">Scraper</span> (há 2h)</span>
-              </div>
-              <div className="h-4 w-px bg-zinc-700"></div>
-              <div className="flex items-center gap-2">
-                <span className="text-base">💎</span>
-                <span>Plano <span className="font-bold text-purple-400">Pro</span> Ativo</span>
+              <Spotlight
+                  className="-top-20 -left-20 md:left-0 md:-top-10"
+                  fill={'#a855f7'}
+              />
+              <div className="relative z-10 flex items-center justify-around gap-6 text-sm text-zinc-400">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🔥</span>
+                  <span><span className="font-bold text-white">2</span> Leads capturados hoje</span>
+                </div>
+                <div className="h-4 w-px bg-zinc-700"></div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">⚡</span>
+                  <span>Último uso: <span className="font-bold text-white">Scraper</span> (há 2h)</span>
+                </div>
+                <div className="h-4 w-px bg-zinc-700"></div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">💎</span>
+                  <span>Plano <span className="font-bold text-purple-400">Pro</span> Ativo</span>
+                </div>
               </div>
             </motion.div>
 

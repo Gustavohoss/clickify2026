@@ -68,9 +68,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function ContratoPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [generatedContract, setGeneratedContract] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
-  const contractRef = useRef<HTMLPreElement>(null);
   
   const methods = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -91,53 +89,92 @@ export default function ContratoPage() {
     }
   };
 
-  const generateContract = () => {
-    // Lógica para gerar o contrato com IA
-    const data = methods.getValues();
-    const contractText = `
-CONTRATO DE PRESTAÇÃO DE SERVIÇOS
-
-CONTRATANTE: ${data.contratanteNome}, CPF/CNPJ ${data.contratanteDocumento}, com endereço em ${data.contratanteEndereco}.
-
-CONTRATADO: ${data.contratadoNome}, CPF/CNPJ ${data.contratadoDocumento}, com endereço em ${data.contratadoEndereco}.
-
-OBJETO DO CONTRATO: ${data.escopo}.
-
-VALOR E PAGAMENTO: O valor total dos serviços é de R$ ${data.valor}, a ser pago via ${data.formaPagamento}.
-
-PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.dataInicio}.
-
-[... Cláusulas geradas por IA ...]
-    `.trim();
-    setGeneratedContract(contractText);
+  const showFinalStep = () => {
     setCurrentStep(steps.length - 1);
   };
 
   const downloadPdf = async () => {
-    const element = contractRef.current;
-    if (!element || !element.textContent) return;
-    
     setIsDownloading(true);
-
     try {
+        const data = methods.getValues();
         const pdf = new jsPDF({
             orientation: 'p',
             unit: 'mm',
             format: 'a4'
         });
 
-        // Configurações da fonte e margens
-        pdf.setFont('Helvetica', 'normal');
-        pdf.setFontSize(10);
-        const margin = 15;
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const usableWidth = pageWidth - margin * 2;
+        const margin = 20;
+        const usableWidth = pdf.internal.pageSize.getWidth() - margin * 2;
+        let currentY = margin;
 
-        // Adiciona o texto ao PDF com quebra de linha automática
-        pdf.text(element.textContent, margin, margin, {
-            maxWidth: usableWidth
-        });
+        pdf.setFontSize(14);
+        pdf.setFont('Helvetica', 'bold');
+        pdf.text('CONTRATO DE PRESTAÇÃO DE SERVIÇOS', pdf.internal.pageSize.getWidth() / 2, currentY, { align: 'center' });
+        currentY += 15;
+
+        pdf.setFontSize(11);
+        pdf.setFont('Helvetica', 'normal');
+
+        // --- PARTES ENVOLVIDAS ---
+        pdf.setFont('Helvetica', 'bold');
+        pdf.text('1. DAS PARTES', margin, currentY);
+        currentY += 8;
+
+        pdf.setFont('Helvetica', 'normal');
+        let contratanteText = `CONTRATANTE: ${data.contratanteNome}, devidamente inscrita no CPF/CNPJ sob o nº ${data.contratanteDocumento}, com sede em ${data.contratanteEndereco}.`;
+        let splitContratante = pdf.splitTextToSize(contratanteText, usableWidth);
+        pdf.text(splitContratante, margin, currentY);
+        currentY += (splitContratante.length * 5) + 5;
+
+        let contratadoText = `CONTRATADO: ${data.contratadoNome}, devidamente inscrito no CPF/CNPJ sob o nº ${data.contratadoDocumento}, com sede em ${data.contratadoEndereco}.`;
+        let splitContratado = pdf.splitTextToSize(contratadoText, usableWidth);
+        pdf.text(splitContratado, margin, currentY);
+        currentY += (splitContratado.length * 5) + 10;
+        
+        // --- OBJETO ---
+        pdf.setFont('Helvetica', 'bold');
+        pdf.text('2. DO OBJETO DO CONTRATO', margin, currentY);
+        currentY += 8;
+        
+        pdf.setFont('Helvetica', 'normal');
+        let objetoText = `Cláusula 2.1. O presente contrato tem como objeto a prestação dos seguintes serviços pelo CONTRATADO em favor da CONTRATANTE: ${data.escopo}.`;
+        let splitObjeto = pdf.splitTextToSize(objetoText, usableWidth);
+        pdf.text(splitObjeto, margin, currentY);
+        currentY += (splitObjeto.length * 5) + 10;
+
+        // --- VALOR E PAGAMENTO ---
+        pdf.setFont('Helvetica', 'bold');
+        pdf.text('3. DO VALOR E DA FORMA DE PAGAMENTO', margin, currentY);
+        currentY += 8;
+        
+        pdf.setFont('Helvetica', 'normal');
+        let valorText = `Cláusula 3.1. Pela prestação dos serviços, a CONTRATANTE pagará ao CONTRATADO o valor de R$ ${data.valor}, através de ${data.formaPagamento}.`;
+        let splitValor = pdf.splitTextToSize(valorText, usableWidth);
+        pdf.text(splitValor, margin, currentY);
+        currentY += (splitValor.length * 5) + 10;
+
+        // --- PRAZOS E VIGÊNCIA ---
+        pdf.setFont('Helvetica', 'bold');
+        pdf.text('4. DO PRAZO E VIGÊNCIA', margin, currentY);
+        currentY += 8;
+        
+        pdf.setFont('Helvetica', 'normal');
+        let prazoText = `Cláusula 4.1. O presente contrato terá vigência de ${data.prazo}, com início em ${data.dataInicio}.`;
+        let splitPrazo = pdf.splitTextToSize(prazoText, usableWidth);
+        pdf.text(splitPrazo, margin, currentY);
+        currentY += (splitPrazo.length * 5) + 20;
+
+        // --- ASSINATURAS ---
+        currentY = pdf.internal.pageSize.getHeight() - 40;
+        pdf.text('________________________________', margin, currentY);
+        pdf.text(data.contratanteNome, margin, currentY + 6);
+        pdf.text('CONTRATANTE', margin, currentY + 11);
+
+        const contratadoX = pdf.internal.pageSize.getWidth() - margin - pdf.getTextWidth('________________________________');
+        pdf.text('________________________________', contratadoX, currentY);
+        pdf.text(data.contratadoNome, contratadoX, currentY + 6);
+        pdf.text('CONTRATADO', contratadoX, currentY + 11);
+
 
         pdf.save('contrato.pdf');
     } catch (error) {
@@ -266,29 +303,14 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
         );
       case 4:
         return (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-            <div className="flex justify-between items-start">
-                <h3 className="text-xl font-bold text-white">Contrato Gerado</h3>
-                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" className="text-purple-400 hover:text-purple-300 hover:bg-white/10">
-                        <Clipboard className="w-4 h-4 mr-2" />
-                        Copiar
-                    </Button>
-                     <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={downloadPdf} 
-                        disabled={isDownloading}
-                        className="text-green-400 hover:text-green-300 hover:bg-white/10"
-                    >
-                        {isDownloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <FileDown className="w-4 h-4 mr-2" />}
-                        {isDownloading ? 'Baixando...' : 'Baixar PDF'}
-                    </Button>
-                </div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 flex flex-col items-center justify-center h-full text-center">
+            <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center border-2 border-green-500/30">
+                <FileText className="w-10 h-10 text-green-400" />
             </div>
-            <pre ref={contractRef} className="w-full bg-zinc-900 p-6 rounded-lg text-white/90 text-sm overflow-x-auto whitespace-pre-wrap font-mono h-[440px]">
-                {generatedContract || "Clique em 'Gerar Contrato' para ver o resultado."}
-            </pre>
+            <h3 className="text-2xl font-bold text-white">Contrato Pronto para Download</h3>
+            <p className="text-zinc-400 max-w-sm">
+                Todas as informações foram preenchidas. Clique no botão abaixo para baixar o seu contrato em formato PDF.
+            </p>
           </motion.div>
         );
       default:
@@ -349,7 +371,7 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
                 </nav>
 
                 <FormProvider {...methods}>
-                    <form onSubmit={methods.handleSubmit(generateContract)} className="backdrop-blur-xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl p-8 min-h-[500px]">
+                    <form onSubmit={(e) => { e.preventDefault(); methods.handleSubmit(showFinalStep)(); }} className="backdrop-blur-xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl p-8 min-h-[500px]">
                          <AnimatePresence mode="wait">
                             <motion.div key={currentStep}>
                                 {renderStep()}
@@ -375,9 +397,9 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
                         <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
                 ) : currentStep === steps.length - 2 ? (
-                     <GradientButton onClick={generateContract} className="gradient-button-green">
+                     <GradientButton onClick={methods.handleSubmit(showFinalStep)} className="gradient-button-green">
                         <Sparkles className="w-4 h-4 mr-2" />
-                        Gerar Contrato
+                        Finalizar e Gerar
                     </GradientButton>
                 ) : (
                     <Button 

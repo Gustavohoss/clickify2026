@@ -100,7 +100,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="flex flex-col items-center gap-4 mt-8">
+        <div className="flex flex-col items-center gap-4 mt-8 relative z-30">
             <Button asChild size="lg" variant="glow" className="w-64 h-14 text-lg font-bold rounded-full">
                 <Link href="#pricing">Assinar agora</Link>
             </Button>

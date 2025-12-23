@@ -16,6 +16,8 @@ import { Footer } from "@/components/ui/footer-section";
 import HowItWorks from "@/components/landing/how-it-works";
 import WhyChooseUs from "@/components/landing/why-choose-us";
 import Results from "@/components/landing/results";
+import { ArrowRight, Building2, FileText, Search, Sparkles } from "lucide-react";
+import { Spotlight } from "@/components/ui/spotlight";
 
 const partners = [
   PlaceHolderImages.find(p => p.id === 'kiwify-logo'),
@@ -99,13 +101,164 @@ export default function Home() {
         </div>
         
         <div className="relative z-20 mt-12 flex flex-col items-center gap-8 w-full max-w-5xl px-4 md:px-8">
-            <Image
-              src="https://s3.typebot.io/public/workspaces/cmj62bxvv000fju04wwudfwgk/typebots/cmjclddjn000kl204sjzbusjb/blocks/cq9c2my48nr7x2wy1ryamh5x?v=1766531231188"
-              alt="Dashboard"
-              width={1200}
-              height={900}
-              className="w-full h-auto rounded-lg border-2 border-primary/20 shadow-2xl shadow-primary/10 mb-4"
-            />
+            {/* PAINEL RECREATED HERE */}
+            <div className="w-full max-w-5xl mx-auto relative z-10 bg-black/80 border border-purple-500/20 rounded-2xl p-8 shadow-2xl shadow-purple-500/10 backdrop-blur-sm">
+                <div
+                    className="relative z-10 space-y-12"
+                >
+                    <div className="text-left space-y-4">
+                        <div
+                            className="inline-block"
+                        >
+                            <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60 pb-2">
+                            Bem-vindo, ADM
+                            </h1>
+                        </div>
+                        <p
+                            className="text-lg text-white/50 max-w-2xl"
+                        >
+                            Escolha uma das ferramentas abaixo para começar.
+                        </p>
+                    </div>
+                    
+                    <div 
+                    className="group relative p-3 rounded-2xl overflow-hidden bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 cursor-pointer"
+                    >
+                    <Spotlight
+                        className="-top-20 -left-20 md:left-0 md:-top-10"
+                        fill={'#a855f7'}
+                    />
+                    <div className="relative z-10 flex items-center justify-around gap-6 text-sm text-zinc-400">
+                        <div className="flex items-center gap-2">
+                        <span className="text-base">🔥</span>
+                        <span><span className="font-bold text-white">2</span> Leads capturados hoje</span>
+                        </div>
+                        <div className="h-4 w-px bg-zinc-700"></div>
+                        <div className="flex items-center gap-2">
+                        <span className="text-base">⚡</span>
+                        <span>Último uso: <span className="font-bold text-white">Scraper</span> (há 2h)</span>
+                        </div>
+                        <div className="h-4 w-px bg-zinc-700"></div>
+                        <div className="flex items-center gap-2">
+                        <span className="text-base">💎</span>
+                        <span>Plano <span className="font-bold text-purple-400">Pro</span> Ativo</span>
+                        </div>
+                    </div>
+                    </div>
+
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                    <div
+                        className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 cursor-default"
+                    >
+                        <Spotlight
+                            className="-top-20 -left-20 md:left-0 md:-top-10"
+                            fill={'#a855f7'}
+                        />
+                        <div className="relative z-10">
+                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                            CLICKIFY Scraper
+                            </h2>
+                            <p className="text-white/40 mt-2">
+                            Uma ferramenta de varredura para encontrar informações de estabelecimentos.
+                            </p>
+                        </div>
+                        <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                            Acessar Ferramenta
+                            <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <Search className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-primary/10 transition-colors duration-500"/>
+                    </div>
+                    <div
+                        className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-orange-500/40 hover:shadow-2xl hover:shadow-orange-500/20 cursor-default"
+                    >
+                        <Spotlight
+                            className="-top-20 -left-20 md:left-0 md:-top-10"
+                            fill={'#f97316'}
+                        />
+                        <div className="relative z-10">
+                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                            Gestão de Leads
+                            </h2>
+                            <p className="text-white/40 mt-2">
+                            Gerencie e anote os contatos que você salvou.
+                            </p>
+                        </div>
+                        <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                            Acessar Ferramenta
+                            <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <FileText className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-orange-500/10 transition-colors duration-500"/>
+                    </div>
+                    <div
+                        className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/20 cursor-default"
+                    >
+                        <Spotlight
+                            className="-top-20 -left-20 md:left-0 md:-top-10"
+                            fill={'#3b82f6'}
+                        />
+                        <div className="relative z-10">
+                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                            Gerar Contrato
+                            </h2>
+                            <p className="text-white/40 mt-2">
+                            Crie contratos profissionais para seus clientes em minutos.
+                            </p>
+                        </div>
+                        <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                            Acessar Ferramenta
+                            <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <FileText className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-blue-500/10 transition-colors duration-500"/>
+                    </div>
+                    <div
+                        className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-yellow-500/40 hover:shadow-2xl hover:shadow-yellow-500/20 cursor-default"
+                    >
+                        <Spotlight
+                            className="-top-20 -left-20 md:left-0 md:-top-10"
+                            fill={'#eab308'}
+                        />
+                        <div className="relative z-10">
+                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                            Abordagem de Empresas
+                            </h2>
+                            <p className="text-white/40 mt-2">
+                            Modelos de mensagens e scripts para prospecção.
+                            </p>
+                        </div>
+                        <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                            Acessar Ferramenta
+                            <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <Building2 className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-yellow-500/10 transition-colors duration-500"/>
+                    </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-6">
+                        <div
+                            className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/20 cursor-default"
+                        >
+                        <Spotlight
+                            className="-top-20 -left-20 md:left-0 md:-top-10"
+                            fill={'#6366f1'}
+                        />
+                        <div className="relative z-10">
+                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                            Cria SAAS
+                            </h2>
+                            <p className="text-white/40 mt-2">
+                            Crie a base do seu SAAS ou pegue um ja pronto!
+                            </p>
+                        </div>
+                        <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                            Acessar Ferramenta
+                            <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <Sparkles className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-indigo-500/10 transition-colors duration-500"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <InfiniteMovingLogos />
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
               <Button asChild size="lg" className="w-64 h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full">

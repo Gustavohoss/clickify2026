@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2 } from 'lucide-react';
@@ -163,12 +164,12 @@ function PainelContent() {
               </Link>
               <Link href="/leads" passHref>
                 <motion.div
-                  className="group relative backdrop-blur-xl bg-white/[0.02] rounded-2xl border border-zinc-800 shadow-2xl p-8 cursor-pointer overflow-hidden hover:border-green-500/50 transition-colors duration-300"
+                  className="group relative backdrop-blur-xl bg-white/[0.02] rounded-2xl border border-zinc-800 shadow-2xl p-8 cursor-pointer overflow-hidden hover:border-orange-500/50 transition-colors duration-300"
                   whileHover={{ y: -5 }}
                   transition={{ type: 'spring', stiffness: 300 }}
                 >
                   <div className="relative z-10">
-                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 group-hover:text-green-300 transition-colors">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 group-hover:text-orange-300 transition-colors">
                       Gestão de Leads
                     </h2>
                     <p className="text-white/40 mt-2">
@@ -179,7 +180,7 @@ function PainelContent() {
                     Acessar Ferramenta
                     <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <Briefcase className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-green-500/10 transition-colors duration-500"/>
+                  <FileText className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-orange-500/10 transition-colors duration-500"/>
                 </motion.div>
               </Link>
                <Link href="/contrato" passHref>

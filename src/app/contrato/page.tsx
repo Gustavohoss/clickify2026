@@ -36,7 +36,6 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { GradientButton } from '@/components/ui/gradient-button';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 const steps = [
   { id: '01', name: 'Informações das Partes', icon: Users },
@@ -116,23 +115,30 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
 
   const downloadPdf = async () => {
     const element = contractRef.current;
-    if (!element) return;
+    if (!element || !element.textContent) return;
     
     setIsDownloading(true);
 
     try {
-        const canvas = await html2canvas(element, {
-            scale: 2,
-            backgroundColor: null, 
-        });
-        
         const pdf = new jsPDF({
             orientation: 'p',
-            unit: 'px',
-            format: [canvas.width, canvas.height]
+            unit: 'mm',
+            format: 'a4'
         });
-        
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, canvas.width, canvas.height);
+
+        // Configurações da fonte e margens
+        pdf.setFont('Helvetica', 'normal');
+        pdf.setFontSize(10);
+        const margin = 15;
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const usableWidth = pageWidth - margin * 2;
+
+        // Adiciona o texto ao PDF com quebra de linha automática
+        pdf.text(element.textContent, margin, margin, {
+            maxWidth: usableWidth
+        });
+
         pdf.save('contrato.pdf');
     } catch (error) {
         console.error("Erro ao gerar PDF:", error);

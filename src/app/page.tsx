@@ -101,11 +101,8 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col items-center gap-4 mt-8">
-            <Button asChild size="lg" className="w-64 h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full">
-            <Link href="#pricing">Assinar agora</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="w-64 h-14 text-lg bg-transparent border-primary text-primary hover:bg-primary/10 rounded-full">
-            <Link href="#pricing">Ver Planos</Link>
+            <Button asChild size="lg" variant="glow" className="w-64 h-14 text-lg font-bold rounded-full">
+                <Link href="#pricing">Assinar agora</Link>
             </Button>
         </div>
         

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Button } from "@/components/ui/button-glow"; 
+import { GradientButton } from "@/components/ui/gradient-button"; 
 import Link from "next/link";
 import Image from "next/image";
 import React from 'react';
@@ -11,7 +11,7 @@ import { Header } from "@/components/landing/header";
 import SocialProof from "@/components/landing/social-proof";
 import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button-glow"; 
+import { Button } from "@/components/ui/button-glow"; 
 import { Footer } from "@/components/ui/footer-section";
 import HowItWorks from "@/components/landing/how-it-works";
 import WhyChooseUs from "@/components/landing/why-choose-us";
@@ -101,9 +101,9 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col items-center gap-4 mt-8 relative z-30">
-            <Button asChild size="lg" variant="glow" className="w-64 h-14 text-lg font-bold rounded-full">
+            <GradientButton asChild className="px-8 w-64 h-14 text-lg font-bold rounded-full">
                 <Link href="#pricing">Assinar agora</Link>
-            </Button>
+            </GradientButton>
         </div>
         
         <div className="relative z-20 mt-12 flex flex-col items-center gap-8 w-full max-w-6xl px-4 md:px-8">

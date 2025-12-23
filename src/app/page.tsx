@@ -193,7 +193,7 @@ export default function Home() {
             </div>
 
             <InfiniteMovingLogos />
-            <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
+            <div className="flex flex-col items-center gap-4 mt-4">
               <Button asChild size="lg" className="w-64 h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full">
                 <Link href="#pricing">Assinar agora</Link>
               </Button>

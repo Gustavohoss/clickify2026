@@ -1,9 +1,9 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useForm, FormProvider, useFormContext, Controller } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Input } from '@/components/ui/input';
@@ -27,12 +27,16 @@ import {
   Calendar,
   CircleDollarSign,
   ArrowLeft,
-  Sparkles
+  Sparkles,
+  FileDown,
+  Loader2
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { GradientButton } from '@/components/ui/gradient-button';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const steps = [
   { id: '01', name: 'Informações das Partes', icon: Users },
@@ -66,6 +70,9 @@ type FormData = z.infer<typeof formSchema>;
 export default function ContratoPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [generatedContract, setGeneratedContract] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
+  const contractRef = useRef<HTMLPreElement>(null);
+  
   const methods = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -106,6 +113,34 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
     setGeneratedContract(contractText);
     setCurrentStep(steps.length - 1);
   };
+
+  const downloadPdf = async () => {
+    const element = contractRef.current;
+    if (!element) return;
+    
+    setIsDownloading(true);
+
+    try {
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            backgroundColor: null, 
+        });
+        
+        const pdf = new jsPDF({
+            orientation: 'p',
+            unit: 'px',
+            format: [canvas.width, canvas.height]
+        });
+        
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save('contrato.pdf');
+    } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
+    } finally {
+        setIsDownloading(false);
+    }
+  };
+
 
   const renderStep = () => {
     switch (currentStep) {
@@ -228,12 +263,24 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="flex justify-between items-start">
                 <h3 className="text-xl font-bold text-white">Contrato Gerado</h3>
-                 <Button variant="ghost" size="sm" className="text-purple-400 hover:text-purple-300 hover:bg-white/10">
-                    <Clipboard className="w-4 h-4 mr-2" />
-                    Copiar
-                </Button>
+                 <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className="text-purple-400 hover:text-purple-300 hover:bg-white/10">
+                        <Clipboard className="w-4 h-4 mr-2" />
+                        Copiar
+                    </Button>
+                     <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={downloadPdf} 
+                        disabled={isDownloading}
+                        className="text-green-400 hover:text-green-300 hover:bg-white/10"
+                    >
+                        {isDownloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <FileDown className="w-4 h-4 mr-2" />}
+                        {isDownloading ? 'Baixando...' : 'Baixar PDF'}
+                    </Button>
+                </div>
             </div>
-            <pre className="w-full bg-zinc-900/80 p-4 rounded-lg text-white/90 text-sm overflow-x-auto whitespace-pre-wrap font-mono h-[440px]">
+            <pre ref={contractRef} className="w-full bg-zinc-900 p-6 rounded-lg text-white/90 text-sm overflow-x-auto whitespace-pre-wrap font-mono h-[440px]">
                 {generatedContract || "Clique em 'Gerar Contrato' para ver o resultado."}
             </pre>
           </motion.div>
@@ -327,9 +374,13 @@ PRAZOS: O presente contrato tem vigência de ${data.prazo}, iniciando em ${data.
                         Gerar Contrato
                     </GradientButton>
                 ) : (
-                    <Button onClick={() => { /* Lógica para Enviar ou Salvar */ }} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Enviar ou Salvar Contrato
+                    <Button 
+                        onClick={downloadPdf} 
+                        disabled={isDownloading}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                        {isDownloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <FileDown className="w-4 h-4 mr-2" />}
+                        {isDownloading ? 'Baixando PDF...' : 'Baixar Contrato em PDF'}
                     </Button>
                 )}
             </div>

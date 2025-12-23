@@ -100,7 +100,7 @@ export default function Home() {
         
         <div className="relative z-20 mt-12 flex flex-col items-center gap-8 w-full max-w-5xl px-4 md:px-8">
             <Image
-              src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmi0sldz2000djl043bd6dtvj/blocks/ewcazkwlemjkynkyhtz2tkoy?v=1763539211986"
+              src="https://s3.typebot.io/public/workspaces/cmj62bxvv000fju04wwudfwgk/typebots/cmjclddjn000kl204sjzbusjb/blocks/cq9c2my48nr7x2wy1ryamh5x?v=1766531231188"
               alt="Dashboard"
               width={1200}
               height={900}

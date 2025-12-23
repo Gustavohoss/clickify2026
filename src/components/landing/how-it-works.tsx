@@ -15,7 +15,7 @@ const steps = [
     {
         title: "Visualize e Personalize",
         description: "Personalize cores, fontes e design de forma simples para refletir a identidade da sua marca.",
-        imageUrl: "https://s3.typebot.io/public/workspaces/cmj62bxvv000fju04wwudfwgk/typebots/cmjclddjn000kl204sjzbusjb/blocks/q34p8f98mukm62cd9owthydb?v=1766472851949",
+        imageUrl: "https://s3.typebot.io/public/workspaces/cmj62bxvv000fju04wwudfwgk/typebots/cmjclddjn000kl204sjzbusjb/blocks/dxp2c8agkuhow0krrm2sb4hf?v=1766473755146",
         icon: null
     },
     {
@@ -46,7 +46,7 @@ const HowItWorks = () => {
                     </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-3xl mx-auto">
                     {steps.map((step, index) => (
                         <div key={index} className="flex-1 max-w-sm mx-auto w-full">
                            <GradientCard 

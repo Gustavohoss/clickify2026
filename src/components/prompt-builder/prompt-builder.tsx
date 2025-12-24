@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useMemo, useTransition } from 'react';
@@ -302,27 +303,30 @@ export default function PromptBuilder() {
   
   const generatePrompt = () => {
     startTransition(() => {
-        const P = formData.tipo === 'Outros' ? formData.customTipo : formData.tipo;
+        const h = formData;
+        const P = h.tipo === 'Outros' ? h.customTipo : h.tipo;
+        const Y = h.idioma;
+        const Q = h.plataforma;
+        const m = h.isInstitutional === 'institucional';
+        const V = h.visualStyle;
+        const M = h.tipografia;
+
+        const funcionalidadesManuais = h.funcionalidades.split('\n').filter(line => line.trim() !== '').map(line => `- ${line.trim()}`);
         
-        const funcionalidadesManuais = formData.funcionalidades.split('\n').filter(line => line.trim() !== '').map(line => `- ${line.trim()}`);
-        
-        const funcionalidadesAdicionais = formData.additionalFeatures.map(featureTitle => {
+        const funcionalidadesAdicionais = h.additionalFeatures.map(featureTitle => {
             const feature = additionalFeaturesOptions.find(f => f.title === featureTitle);
             return `- ${feature?.title}: ${feature?.description}`;
         });
 
         const B = [...funcionalidadesManuais, ...funcionalidadesAdicionais].join('\n');
         
-        const m = formData.isInstitutional === 'institucional';
-        const h = formData;
-
         const finalPrompt = `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📋 PROJETO: ${h.siteName}
 📌 TIPO: ${P}
-🌐 IDIOMA: ${h.idioma}
-🔧 PLATAFORMA DE DESENVOLVIMENTO: ${h.plataforma}
+🌐 IDIOMA: ${Y}
+🔧 PLATAFORMA DE DESENVOLVIMENTO: ${Q}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -362,15 +366,15 @@ Implemente cada funcionalidade com:
 
 TIPO DE PROJETO: ${m ? "Site Institucional/Landing Page" : "Aplicativo SaaS/Sistema"}
 
-ESTILO VISUAL: ${h.visualStyle || "Moderno e Profissional"}
+ESTILO VISUAL: ${V || "Moderno e Profissional"}
 
 PALETA DE CORES:
-├─ 🟢 Cor Primária: ${h.primaryColor} (botões, CTAs, destaques)
-├─ ⚫ Cor Secundária: ${h.secondaryColor} (elementos de apoio)
-├─ 🖤 Cor de Fundo: ${h.backgroundColor} (background principal)
-└─ ⚪ Cor do Texto: ${h.textColor} (tipografia principal)
+├─ Cor Primária: ${h.primaryColor} (botões, CTAs, destaques)
+├─ Cor Secundária: ${h.secondaryColor} (elementos de apoio)
+├─ Cor de Fundo: ${h.backgroundColor} (background principal)
+└─ Cor do Texto: ${h.textColor} (tipografia principal)
 
-TIPOGRAFIA: ${h.tipografia || "Fonte moderna e legível"}
+TIPOGRAFIA: ${M || "Fonte moderna e legível"}
 
 DIRETRIZES DE DESIGN:
 - Utilize um Design System consistente com componentes reutilizáveis

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,20 +31,22 @@ import {
   User,
   Lightbulb,
   Search,
-  Trophy
+  Trophy,
+  Settings
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import Link from 'next/link';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { cn } from '@/lib/utils';
+import { generatePrompt as generateFinalPrompt, GeneratePromptInput } from '@/ai/flows/generate-prompt-flow';
 
 const steps = [
   { id: '01', name: 'Informações Básicas', icon: FileText },
   { id: '02', name: 'Design e Estilo', icon: Palette },
   { id: '03', name: 'Público e Funções', icon: Target },
   { id: '04', name: 'Funcionalidades Adicionais', icon: Layers },
-  { id: '05', name: 'Revisão e Geração', icon: Code },
+  { id: '05', name: 'Detalhes Finais', icon: Settings },
+  { id: '06', name: 'Revisão e Geração', icon: Code },
 ];
 
 type FormData = {
@@ -223,52 +225,6 @@ const fontOptions = [
     'Playfair Display, serif',
   ];
 
-type LoadingState = 'idle' | 'loading' | 'success';
-
-const generateFinalPrompt = (data: FormData): string => {
-  const selectedFeaturesDetails = additionalFeaturesOptions
-    .filter(feature => data.additionalFeatures.includes(feature.title))
-    .map(feature => `- **${feature.title}**: ${feature.description}`);
-
-  return `
-### **BRIEFING DE PROJETO: ${data.siteName}**
-
----
-
-#### **1. VISÃO GERAL**
-- **Nome do Projeto:** ${data.siteName}
-- **Tipo:** ${data.tipo} (${data.isInstitutional === 'institucional' ? 'Foco Institucional/Divulgação' : 'Foco em Aplicação/Sistema'})
-- **Idioma Principal:** ${data.idioma}
-- **Plataforma:** ${data.plataforma}
-- **Descrição:** ${data.description}
-
----
-
-#### **2. PÚBLICO E FUNCIONALIDADES**
-- **Público-Alvo:** ${data.targetAudience}
-- **Funcionalidades Principais:**
-  ${data.funcionalidades.split('\n').map(f => `  - ${f}`).join('\n')}
-
----
-
-#### **3. DESIGN E IDENTIDADE VISUAL**
-- **Estilo Visual:** ${data.visualStyle}
-- **Paleta de Cores:**
-  - Primária: \`${data.primaryColor}\`
-  - Secundária: \`${data.secondaryColor}\`
-  - Fundo: \`${data.backgroundColor}\`
-  - Texto: \`${data.textColor}\`
-- **Tipografia:** ${data.tipografia}
-
----
-
-#### **4. REQUISITOS ADICIONAIS**
-- **Funcionalidades Adicionais Selecionadas:**
-${selectedFeaturesDetails.join('\n')}
-- **Inspirações e Referências:** ${data.inspiration || 'Nenhuma informada.'}
-- **Requisitos Especiais:** ${data.specialRequirements || 'Nenhum informado.'}
-  `.trim();
-};
 
 export default function PromptBuilder() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -293,7 +249,7 @@ export default function PromptBuilder() {
   });
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [copied, setCopied] = useState(false);
-  const [loadingPrompt, setLoadingPrompt] = useState<LoadingState>('idle');
+  const [isPending, startTransition] = useTransition();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -343,19 +299,27 @@ export default function PromptBuilder() {
     }
   };
   
-  const generatePrompt = async () => {
-    setLoadingPrompt('loading');
-    try {
-        const result = generateFinalPrompt(formData);
-        setGeneratedPrompt(result);
-        setLoadingPrompt('success');
+  const generatePrompt = () => {
+    startTransition(async () => {
+      try {
+        const featureDetails = formData.additionalFeatures.map(featureTitle => {
+            const feature = additionalFeaturesOptions.find(f => f.title === featureTitle);
+            return feature ? `- **${feature.title}**: ${feature.description}` : '';
+        }).join('\n');
+
+        const input: GeneratePromptInput = {
+            ...formData,
+            additionalFeatures: featureDetails,
+        };
+        const result = await generateFinalPrompt(input);
+        setGeneratedPrompt(result.prompt);
         setCurrentStep(steps.length - 1);
-    } catch(e) {
-        console.error("Failed to generate prompt:", e);
-        setLoadingPrompt('idle');
-        // Optionally, show an error to the user
-    }
-};
+      } catch(e) {
+          console.error("Failed to generate prompt:", e);
+          // Optionally, show an error to the user
+      }
+    });
+  };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -575,6 +539,19 @@ export default function PromptBuilder() {
             </div>
           </motion.div>
         );
+      case 4:
+        return (
+          <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="inspiration" className="text-white/80">Inspirações e Referências</Label>
+                <Textarea id="inspiration" name="inspiration" value={formData.inspiration} onChange={handleChange} placeholder="Liste sites ou apps que você gosta e explique o porquê. Ex: 'Gosto do visual do site da Stripe', 'A simplicidade do app do Nubank', etc." className="bg-white/5 border-white/10 text-white min-h-[120px]" />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="specialRequirements" className="text-white/80">Requisitos Especiais</Label>
+                <Textarea id="specialRequirements" name="specialRequirements" value={formData.specialRequirements} onChange={handleChange} placeholder="Algo mais que a IA deva saber? Ex: 'O projeto deve ser otimizado para SEO', 'Precisa de uma integração com a API X', etc." className="bg-white/5 border-white/10 text-white min-h-[120px]" />
+            </div>
+          </motion.div>
+        );
       default:
         return (
            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
@@ -679,9 +656,9 @@ export default function PromptBuilder() {
                       <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
               ) : (
-                <GradientButton onClick={generatePrompt} className="gradient-button-green" disabled={loadingPrompt === 'loading'}>
-                    {loadingPrompt === 'loading' ? <RefreshCw className="w-4 h-4 animate-spin"/> : <Code className="w-4 h-4" />}
-                    <span className="ml-2">{loadingPrompt === 'loading' ? 'Gerando...' : 'Gerar Prompt'}</span>
+                <GradientButton onClick={generatePrompt} className="gradient-button-green" disabled={isPending}>
+                    {isPending ? <RefreshCw className="w-4 h-4 animate-spin"/> : <Code className="w-4 h-4" />}
+                    <span className="ml-2">{isPending ? 'Gerando...' : 'Gerar Prompt'}</span>
                 </GradientButton>
               )}
           </div>

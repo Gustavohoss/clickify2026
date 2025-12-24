@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,21 +21,30 @@ import {
   FileText,
   Palette,
   Target,
-  Settings,
+  Layers,
   Code,
   Sparkles,
+  RefreshCw,
+  LayoutTemplate,
+  Shield,
+  Moon,
+  User,
+  Lightbulb,
+  Search,
+  Trophy
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Link from 'next/link';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { cn } from '@/lib/utils';
+import { generateIdea, GenerateIdeaInput, generatePrompt as generateFinalPrompt, GeneratePromptInput } from '@/ai/flows/generate-idea-flow';
 
 const steps = [
   { id: '01', name: 'Informações Básicas', icon: FileText },
   { id: '02', name: 'Design e Estilo', icon: Palette },
   { id: '03', name: 'Público e Funções', icon: Target },
-  { id: '04', name: 'Detalhes Adicionais', icon: Settings },
+  { id: '04', name: 'Funcionalidades Adicionais', icon: Layers },
   { id: '05', name: 'Revisão e Geração', icon: Code },
 ];
 
@@ -56,7 +65,68 @@ type FormData = {
   tipografia: string;
   specialRequirements: string;
   inspiration: string;
+  additionalFeatures: string[];
 };
+
+const additionalFeaturesOptions = [
+  {
+    title: 'Design 100% Responsivo',
+    description: 'Garante que a interface se adapte a qualquer tamanho de tela.',
+    icon: LayoutTemplate,
+    badge: 'Padrão',
+    badgeColor: 'bg-blue-500/10 text-blue-300 border-blue-500/30'
+  },
+  {
+    title: 'Estados de Carregamento',
+    description: 'Animações visuais enquanto os dados são processados.',
+    icon: RefreshCw,
+    badge: 'Recomendado',
+    badgeColor: 'bg-green-500/10 text-green-300 border-green-500/30'
+  },
+  {
+    title: 'Tratamento de Erros Amigável',
+    description: 'Exibe mensagens claras e úteis quando algo dá errado.',
+    icon: Shield,
+    badge: 'Recomendado',
+    badgeColor: 'bg-green-500/10 text-green-300 border-green-500/30'
+  },
+  {
+    title: 'Modo Escuro/Claro',
+    description: 'Permite ao usuário alternar entre um tema claro e um escuro.',
+    icon: Moon,
+    badge: 'Recomendado',
+    badgeColor: 'bg-green-500/10 text-green-300 border-green-500/30'
+  },
+  {
+    title: 'Gerenciamento de Perfil',
+    description: 'Página para o usuário atualizar suas informações pessoais e senha.',
+    icon: User,
+    badge: 'Recomendado',
+    badgeColor: 'bg-green-500/10 text-green-300 border-green-500/30'
+  },
+  {
+    title: 'Onboarding Interativo',
+    description: 'Um tour guiado na primeira visita para apresentar as funcionalidades.',
+    icon: Lightbulb,
+    badge: 'Opcional',
+    badgeColor: 'bg-yellow-500/10 text-yellow-300 border-yellow-500/30'
+  },
+  {
+    title: 'Busca Global',
+    description: 'Uma barra de busca que permita encontrar informações em todo o app.',
+    icon: Search,
+    badge: 'Recomendado',
+    badgeColor: 'bg-green-500/10 text-green-300 border-green-500/30'
+  },
+  {
+    title: 'Sistema de Gamificação',
+    description: 'Adiciona pontos e medalhas para incentivar o uso.',
+    icon: Trophy,
+    badge: 'Opcional',
+    badgeColor: 'bg-yellow-500/10 text-yellow-300 border-yellow-500/30'
+  }
+];
+
 
 const colorPalettes = [
   { 
@@ -154,6 +224,68 @@ const fontOptions = [
     'Playfair Display, serif',
   ];
 
+type LoadingState = 'idle' | 'loading' | 'success';
+
+const FieldWithAI = ({
+  label,
+  children,
+  field,
+  formData,
+  onSuggestion,
+}: {
+  label: string;
+  children: React.ReactNode;
+  field: keyof FormData;
+  formData: FormData;
+  onSuggestion: (field: keyof FormData, value: string) => void;
+}) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleGenerateIdea = async () => {
+    setLoading(true);
+    try {
+      const result = await generateIdea({
+        field: field,
+        context: {
+          siteName: formData.siteName,
+          description: formData.description,
+        },
+      });
+      onSuggestion(field, result);
+    } catch (e) {
+      console.error(e);
+      // Handle error (e.g., show a toast)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="relative space-y-2">
+      <div className="flex justify-between items-center">
+        <Label htmlFor={field} className="text-white/80">
+          {label}
+        </Label>
+        <Button
+          onClick={handleGenerateIdea}
+          size="sm"
+          variant="ghost"
+          className="text-purple-400 hover:text-purple-300 text-xs"
+          disabled={loading}
+        >
+          {loading ? (
+            <RefreshCw className="w-3 h-3 mr-1.5 animate-spin" />
+          ) : (
+            <Sparkles className="w-3 h-3 mr-1.5" />
+          )}
+          {loading ? 'Gerando...' : 'Sugerir com IA'}
+        </Button>
+      </div>
+      {children}
+    </div>
+  );
+};
+
 export default function PromptBuilder() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
@@ -173,9 +305,11 @@ export default function PromptBuilder() {
     tipografia: 'Inter, sans-serif',
     specialRequirements: '',
     inspiration: '',
+    additionalFeatures: ['Design 100% Responsivo'],
   });
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [copied, setCopied] = useState(false);
+  const [loadingPrompt, setLoadingPrompt] = useState<LoadingState>('idle');
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -186,6 +320,22 @@ export default function PromptBuilder() {
 
   const handleSelectChange = (name: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSuggestion = (field: keyof FormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+  
+  const handleFeatureToggle = (featureTitle: string) => {
+    setFormData(prev => {
+        const currentFeatures = prev.additionalFeatures;
+        const isAlreadyAdded = currentFeatures.includes(featureTitle);
+        if (isAlreadyAdded) {
+            return { ...prev, additionalFeatures: currentFeatures.filter(f => f !== featureTitle) };
+        } else {
+            return { ...prev, additionalFeatures: [...currentFeatures, featureTitle] };
+        }
+    });
   };
 
   const handlePaletteChange = (paletteName: string) => {
@@ -213,133 +363,27 @@ export default function PromptBuilder() {
     }
   };
   
-  const generatePrompt = () => {
-    const p = formData;
-    const E = p.tipo;
-    const D = p.idioma;
-    const F = p.plataforma;
-    const L = p.funcionalidades;
-    const m = p.isInstitutional === 'institucional';
-    const $ = p.visualStyle;
-    const I = p.tipografia;
+  const generatePrompt = async () => {
+    setLoadingPrompt('loading');
+    const selectedFeaturesDetails = additionalFeaturesOptions
+      .filter(feature => formData.additionalFeatures.includes(feature.title))
+      .map(feature => ({
+        title: feature.title,
+        description: feature.description
+      }));
+    
+    try {
+        const result = await generateFinalPrompt({ ...formData, additionalFeatures: selectedFeaturesDetails });
+        setGeneratedPrompt(result);
+        setLoadingPrompt('success');
+        setCurrentStep(steps.length - 1);
+    } catch(e) {
+        console.error("Failed to generate prompt:", e);
+        setLoadingPrompt('idle');
+        // Optionally, show an error to the user
+    }
+};
 
-    const prompt = `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 PROJETO: ${p.siteName}
-📌 TIPO: ${E}
-🌐 IDIOMA: ${D}
-🔧 PLATAFORMA DE DESENVOLVIMENTO: ${F}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📝 VISÃO GERAL DO PROJETO
-Desenvolva ${E.toLowerCase()} completo e profissional chamado "${p.siteName}". Este projeto deve ser construído seguindo as melhores práticas de desenvolvimento moderno, com foco em performance, escalabilidade e experiência do usuário excepcional.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📄 DESCRIÇÃO DETALHADA
-${p.description||"Criar uma aplicação moderna e funcional que atenda às necessidades do usuário final."}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-👥 PÚBLICO-ALVO E PERSONAS
-${p.targetAudience||"Usuários que buscam uma solução digital intuitiva e eficiente."}
-
-Considere criar personas detalhadas para:
-- Usuário principal (perfil demográfico, necessidades, dores)
-- Usuário secundário (casos de uso alternativos)
-- Administrador do sistema (se aplicável)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-⚡ FUNCIONALIDADES PRINCIPAIS
-${L||"Sistema responsivo com funcionalidades essenciais"}
-
-Implemente cada funcionalidade com:
-- Validação de dados robusta
-- Tratamento de erros elegante
-- Feedback visual para o usuário
-- Estados de loading adequados
-- Animações suaves e profissionais
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🎨 DESIGN SYSTEM E IDENTIDADE VISUAL
-
-TIPO DE PROJETO: ${m?"Site Institucional/Landing Page":"Aplicativo SaaS/Sistema"}
-
-ESTILO VISUAL: ${$||"Moderno e Profissional"}
-
-PALETA DE CORES:
-├─ 🟢 Cor Primária: ${p.primaryColor} (botões, CTAs, destaques)
-├─ ⚫ Cor Secundária: ${p.secondaryColor} (elementos de apoio)
-├─ 🖤 Cor de Fundo: ${p.backgroundColor} (background principal)
-└─ ⚪ Cor do Texto: ${p.textColor} (tipografia principal)
-
-TIPOGRAFIA: ${I||"Fonte moderna e legível"}
-
-DIRETRIZES DE DESIGN:
-- Utilize um Design System consistente com componentes reutilizáveis
-- Aplique hierarquia visual clara com espaçamento adequado
-- Implemente micro-interações e transições suaves
-- Garanta contraste adequado para acessibilidade (WCAG 2.1)
-- Use ícones consistentes (Lucide React ou similar)
-- Aplique sombras e gradientes sutis para profundidade
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📱 RESPONSIVIDADE
-- Mobile First: otimize para dispositivos móveis primeiro
-- Breakpoints: 320px, 768px, 1024px, 1280px, 1536px
-- Touch-friendly: áreas de toque mínimas de 44x44px
-- Navegação adaptativa para diferentes tamanhos de tela
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🔧 REQUISITOS TÉCNICOS
-- React + TypeScript para tipagem segura
-- Tailwind CSS para estilização
-- Componentes funcionais com hooks modernos
-- Gerenciamento de estado eficiente
-- Código limpo, modular e bem documentado
-- SEO otimizado com meta tags apropriadas
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-⭐ REQUISITOS ESPECIAIS E PERSONALIZAÇÕES
-${p.specialRequirements||"Nenhum requisito especial adicional."}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 INSPIRAÇÃO E REFERÊNCIAS
-${p.inspiration||"Busque inspiração em designs modernos e tendências atuais de UI/UX."}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-✅ CHECKLIST DE QUALIDADE
-□ Interface intuitiva e fácil de usar
-□ Performance otimizada (Lighthouse score > 90)
-□ Código limpo e manutenível
-□ Testes de usabilidade considerados
-□ Acessibilidade implementada
-□ Loading states e empty states definidos
-□ Mensagens de erro claras e amigáveis
-□ Animações suaves sem impactar performance
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🎯 RESULTADO ESPERADO
-Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O projeto deve impressionar visualmente, funcionar perfeitamente em todos os dispositivos e proporcionar uma experiência de usuário excepcional.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📌 Gerado pela CLICKIFY - Sua plataforma de criação de SaaS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
-    setGeneratedPrompt(prompt.trim());
-    setCurrentStep(steps.length - 1);
-  };
-  
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedPrompt);
     setCopied(true);
@@ -351,10 +395,9 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
       case 0:
         return (
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="space-y-6">
-             <div className="space-y-2">
-              <Label htmlFor="siteName" className="text-white/80">Nome do Projeto/Site</Label>
+             <FieldWithAI label="Nome do Projeto/Site" field="siteName" formData={formData} onSuggestion={handleSuggestion}>
               <Input id="siteName" name="siteName" value={formData.siteName} onChange={handleChange} placeholder="Ex: Clickify, Barbearia do Zé" className="bg-white/5 border-white/10 text-white" />
-            </div>
+            </FieldWithAI>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label className="text-white/80">Tipo de Projeto</Label>
@@ -411,17 +454,15 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                 </div>
               </RadioGroup>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-white/80">Descrição Geral do Projeto</Label>
+            <FieldWithAI label="Descrição Geral do Projeto" field="description" formData={formData} onSuggestion={handleSuggestion}>
               <Textarea id="description" name="description" value={formData.description} onChange={handleChange} placeholder="Descreva em poucas palavras o que o projeto faz e qual problema ele resolve." className="bg-white/5 border-white/10 text-white min-h-[120px]" />
-            </div>
+            </FieldWithAI>
           </motion.div>
         );
       case 1:
         return (
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="space-y-6">
-            <div className="space-y-2">
-              <Label className="text-white/80">Estilo Visual</Label>
+            <FieldWithAI label="Estilo Visual" field="visualStyle" formData={formData} onSuggestion={handleSuggestion}>
               <Select name="visualStyle" value={formData.visualStyle} onValueChange={(value) => handleSelectChange('visualStyle', value)}>
                 <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-zinc-900 text-white border-zinc-800">
@@ -432,7 +473,7 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                   <SelectItem value="Robusto e Industrial">Robusto e Industrial</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </FieldWithAI>
 
             <div className="space-y-2">
                 <Label className="text-white/80">Paletas de Cores Pré-definidas</Label>
@@ -505,26 +546,54 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
       case 2:
         return (
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="targetAudience" className="text-white/80">Público-Alvo</Label>
+            <FieldWithAI label="Público-Alvo" field="targetAudience" formData={formData} onSuggestion={handleSuggestion}>
               <Textarea id="targetAudience" name="targetAudience" value={formData.targetAudience} onChange={handleChange} placeholder="Descreva para quem é este projeto. Ex: Pequenas empresas, estudantes, entusiastas de tecnologia, etc." className="bg-white/5 border-white/10 text-white min-h-[120px]" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="funcionalidades" className="text-white/80">Funcionalidades Principais</Label>
+            </FieldWithAI>
+            <FieldWithAI label="Funcionalidades Principais" field="funcionalidades" formData={formData} onSuggestion={handleSuggestion}>
               <Textarea id="funcionalidades" name="funcionalidades" value={formData.funcionalidades} onChange={handleChange} placeholder="Liste as funcionalidades essenciais. Ex: Login de usuário, Dashboard com gráficos, Upload de arquivos, etc. (uma por linha)" className="bg-white/5 border-white/10 text-white min-h-[150px]" />
-            </div>
+            </FieldWithAI>
           </motion.div>
         );
       case 3:
         return (
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="specialRequirements" className="text-white/80">Requisitos Especiais ou Personalizações</Label>
-              <Textarea id="specialRequirements" name="specialRequirements" value={formData.specialRequirements} onChange={handleChange} placeholder="Algo específico que precisa ser considerado? Ex: Integração com API externa, modo escuro, suporte a múltiplos idiomas, etc." className="bg-white/5 border-white/10 text-white min-h-[150px]" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="inspiration" className="text-white/80">Inspirações e Referências</Label>
-              <Textarea id="inspiration" name="inspiration" value={formData.inspiration} onChange={handleChange} placeholder="Cite sites ou apps que você gosta e por quê. Ex: 'Gosto do design do Stripe pela simplicidade', 'Adoro as animações do site da Apple'." className="bg-white/5 border-white/10 text-white min-h-[150px]" />
+            <h3 className="text-lg font-bold text-white">Funcionalidades Adicionais</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {additionalFeaturesOptions.map(feature => {
+                const isSelected = formData.additionalFeatures.includes(feature.title);
+                return (
+                  <motion.div
+                    key={feature.title}
+                    onClick={() => handleFeatureToggle(feature.title)}
+                    className={cn(
+                        "relative p-4 rounded-lg cursor-pointer border transition-all duration-300",
+                        isSelected ? 'bg-purple-500/10 border-purple-500/50 shadow-inner shadow-purple-900/50' : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    )}
+                    whileHover={{ scale: 1.03 }}
+                  >
+                    <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className={cn("w-8 h-8 rounded-md flex items-center justify-center", isSelected ? 'bg-purple-500/20' : 'bg-zinc-700/50')}>
+                                <feature.icon className={cn("w-5 h-5", isSelected ? 'text-purple-300' : 'text-zinc-300')} />
+                            </div>
+                            <h4 className={cn("font-semibold", isSelected ? 'text-white' : 'text-zinc-200')}>{feature.title}</h4>
+                        </div>
+                        <div className={cn("w-5 h-5 rounded-full flex items-center justify-center border", isSelected ? 'bg-purple-500 border-purple-400' : 'border-zinc-600')}>
+                            {isSelected && <Check className="w-3 h-3 text-white" />}
+                        </div>
+                    </div>
+                    <p className="text-xs text-zinc-400 mt-2 pl-11">{feature.description}</p>
+                    {feature.badge && (
+                      <div className={cn(
+                          "absolute bottom-2 left-2 text-xs font-medium px-2 py-0.5 rounded-full border",
+                          feature.badgeColor
+                      )}>
+                          {feature.badge}
+                      </div>
+                    )}
+                  </motion.div>
+                )
+              })}
             </div>
           </motion.div>
         );
@@ -553,12 +622,12 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                 {generatedPrompt}
             </pre>
             <div className="flex justify-center pt-4">
-              <Link href="https://lovable.dev/invite/9JZ3191" passHref>
+              <a href="https://lovable.dev/invite/9JZ3191" target="_blank" rel="noopener noreferrer">
                 <GradientButton variant="variant">
                   <Sparkles className="w-4 h-4" />
-                  <span className="ml-2">Criar site!</span>
+                  <span className="ml-2">Gerar meu SaaS na Lovable</span>
                 </GradientButton>
-              </Link>
+              </a>
             </div>
           </motion.div>
         );
@@ -589,7 +658,11 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                           currentStep < index && 'bg-zinc-800 text-zinc-400 border border-zinc-700'
                       )}
                       >
-                      {currentStep > index ? <Check className="w-5 h-5" /> : <step.icon className="w-5 h-5" />}
+                      {currentStep > index ? <Check className="w-5 h-5" /> : (
+                         <div className="h-10 w-10 rounded-full flex items-center justify-center">
+                            <step.icon className="w-5 h-5" />
+                         </div>
+                      )}
                       </div>
                       <span className={`font-medium transition-colors ${currentStep >= index ? 'text-white' : 'text-zinc-500'}`}>{step.name}</span>
                   </div>
@@ -628,9 +701,9 @@ Entregue ${E.toLowerCase()} completo, profissional e pronto para produção. O p
                       <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
               ) : (
-                <GradientButton onClick={generatePrompt} className="gradient-button-green">
-                    <Code className="w-4 h-4" />
-                    <span className="ml-2">Gerar Prompt</span>
+                <GradientButton onClick={generatePrompt} className="gradient-button-green" disabled={loadingPrompt === 'loading'}>
+                    {loadingPrompt === 'loading' ? <RefreshCw className="w-4 h-4 animate-spin"/> : <Code className="w-4 h-4" />}
+                    <span className="ml-2">{loadingPrompt === 'loading' ? 'Gerando...' : 'Gerar Prompt'}</span>
                 </GradientButton>
               )}
           </div>

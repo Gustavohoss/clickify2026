@@ -51,6 +51,7 @@ const steps = [
 type FormData = {
   siteName: string;
   tipo: string;
+  customTipo: string;
   idioma: string;
   plataforma: string;
   isInstitutional: string;
@@ -230,6 +231,7 @@ export default function PromptBuilder() {
   const [formData, setFormData] = useState<FormData>({
     siteName: '',
     tipo: 'Site Institucional',
+    customTipo: '',
     idioma: 'Português (Brasil)',
     plataforma: 'Web (Desktop e Mobile)',
     isInstitutional: 'institucional',
@@ -305,6 +307,8 @@ export default function PromptBuilder() {
             return feature ? `- **${feature.title}**: ${feature.description}` : '';
         }).join('\n');
 
+        const projectType = formData.tipo === 'Outros' ? formData.customTipo : formData.tipo;
+
         const finalPrompt = `
 ### **BRIEFING DE PROJETO: ${formData.siteName}**
 
@@ -312,7 +316,7 @@ export default function PromptBuilder() {
 
 #### **1. VISÃO GERAL**
 - **Nome do Projeto:** ${formData.siteName}
-- **Tipo:** ${formData.tipo} (Foco em ${formData.isInstitutional})
+- **Tipo:** ${projectType} (Foco em ${formData.isInstitutional})
 - **Idioma Principal:** ${formData.idioma}
 - **Plataforma:** ${formData.plataforma}
 - **Descrição:** ${formData.description}
@@ -377,9 +381,27 @@ ${featureDetails}
                     <SelectItem value="E-commerce">E-commerce</SelectItem>
                     <SelectItem value="Aplicativo SaaS">Aplicativo SaaS</SelectItem>
                     <SelectItem value="Sistema Interno">Sistema Interno</SelectItem>
+                    <SelectItem value="Outros">Outros</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+               {formData.tipo === 'Outros' && (
+                <motion.div 
+                    initial={{ opacity: 0, y: -10 }} 
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-2 md:col-span-2"
+                >
+                    <Label htmlFor="customTipo" className="text-white/80">Especifique o tipo de projeto</Label>
+                    <Input 
+                        id="customTipo" 
+                        name="customTipo" 
+                        value={formData.customTipo} 
+                        onChange={handleChange} 
+                        placeholder="Ex: Plataforma de Cursos, Rede Social" 
+                        className="bg-white/5 border-white/10 text-white" 
+                    />
+                </motion.div>
+              )}
               <div className="space-y-2">
                 <Label className="text-white/80">Idioma Principal</Label>
                 <Select name="idioma" value={formData.idioma} onValueChange={(value) => handleSelectChange('idioma', value)}>

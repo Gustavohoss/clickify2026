@@ -1,8 +1,10 @@
 'use client';
 import { Hourglass, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function VerificationPage() {
+  const router = useRouter();
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white p-4">
       <div className="w-full max-w-md p-8 space-y-6 bg-[#0E101B] rounded-2xl border border-[#2A2D3C] shadow-2xl shadow-blue-500/10">
@@ -22,7 +24,7 @@ export default function VerificationPage() {
           <Button
             variant="outline"
             className="w-full border-gray-600 hover:bg-gray-800"
-            onClick={() => window.location.reload()}
+            onClick={() => router.push('/login')}
           >
             Entendi
           </Button>

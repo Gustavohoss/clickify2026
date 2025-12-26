@@ -301,8 +301,8 @@ export default function LoginPage() {
             Conta em Verificação
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center text-sm text-gray-400 !mt-4 space-y-2">
-            <p>Sua conta está sendo verificada para garantir a segurança e evitar robôs. Este processo pode levar até 1 hora. Agradecemos a sua paciência!</p>
-            <p>Caso demore mais que o esperado, entre em contato com a nossa equipe.</p>
+            <span>Sua conta está sendo verificada para garantir a segurança e evitar robôs. Este processo pode levar até 1 hora. Agradecemos a sua paciência!</span>
+            <span>Caso demore mais que o esperado, entre em contato com a nossa equipe.</span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">

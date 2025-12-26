@@ -18,13 +18,18 @@
           "type": "string",
           "description": "The user's display name."
         },
+        "plan": {
+          "type": "string",
+          "description": "The user's subscription plan.",
+          "enum": ["Pendente", "Mensal", "Trimestral", "Anual", "Vitalicio"]
+        },
         "createdAt": {
           "type": "string",
           "description": "Timestamp indicating when the user account was created.",
           "format": "date-time"
         }
       },
-      "required": ["id", "email", "createdAt", "displayName"]
+      "required": ["id", "email", "createdAt", "displayName", "plan"]
     },
     "Lead": {
       "title": "Lead",
@@ -104,5 +109,3 @@
     }
   }
 }
-
-    

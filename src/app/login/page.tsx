@@ -23,7 +23,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { setDoc, doc, serverTimestamp, getDoc } from 'firebase/firestore';
 
 const GoogleIcon = () => (
     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -76,6 +76,7 @@ export default function LoginPage() {
             email: user.email,
             displayName: displayName,
             createdAt: serverTimestamp(),
+            plan: 'Pendente',
         });
 
       } else {
@@ -98,15 +99,22 @@ export default function LoginPage() {
       const user = result.user;
       
       const userDocRef = doc(firestore, 'users', user.uid);
-      await setDoc(userDocRef, {
-        id: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        createdAt: serverTimestamp(),
-      }, { merge: true });
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+        // New user signing in with Google
+        await setDoc(userDocRef, {
+            id: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            createdAt: serverTimestamp(),
+            plan: 'Pendente',
+        });
+      }
+      // Existing user, just log them in. Their plan is already set.
 
       router.push('/painel');
-    } catch (err: any) {
+    } catch (err: any) => {
       setError(getFriendlyErrorMessage(err.code));
     } finally {
       setLoading(false);

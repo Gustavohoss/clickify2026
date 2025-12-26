@@ -344,7 +344,7 @@ export default function EquipePage() {
                     <Button 
                         size="lg" 
                         className="mt-10 w-full font-bold bg-white/5 border border-white/10 hover:bg-white/10"
-                        onClick={() => window.location.href='https://pay.cakto.com.br/xy27qg8'}
+                        onClick={() => window.location.href='https://pay.cakto.com.br/xo7ggsc'}
                     >
                         Assinar Anual
                     </Button>
@@ -356,4 +356,5 @@ export default function EquipePage() {
     </main>
   );
 }
+
 

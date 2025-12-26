@@ -294,7 +294,7 @@ export default function LoginPage() {
     </div>
 
     <AlertDialog open={showVerificationPopup} onOpenChange={setShowVerificationPopup}>
-      <AlertDialogContent className="bg-[#0E101B] border-[#2A2D3C] text-white">
+      <AlertDialogContent className="bg-white/[0.02] backdrop-blur-2xl border-purple-500/20 text-white">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-center text-2xl flex flex-col items-center gap-4">
              <Hourglass className="h-12 w-12 text-blue-400" />
@@ -366,3 +366,5 @@ function Alert({
       />
     );
   }
+
+    

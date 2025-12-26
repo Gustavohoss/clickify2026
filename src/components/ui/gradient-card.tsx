@@ -17,7 +17,7 @@ export const GradientCard: React.FC<GradientCardProps> = ({ title, description, 
    return (
     <div className={cn(
         "group relative p-6 rounded-2xl overflow-hidden h-full",
-        "bg-background/50 border border-primary/20",
+        "bg-background/50 border border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.3)]",
         "transition-all duration-300 ease-in-out",
         "hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20"
     )}>

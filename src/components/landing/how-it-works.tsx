@@ -5,6 +5,7 @@ import { BGPattern } from "@/components/ui/bg-pattern";
 import { GradientCard } from "@/components/ui/gradient-card";
 import { Bot, Code, Palette } from "lucide-react";
 import FallingNotificationsSmall from "./falling-notifications-small";
+import ExampleSitePreview from "../ui/example-site-preview";
 
 const steps = [
     {
@@ -23,7 +24,8 @@ const steps = [
         title: "Gere com 1 clique",
         description: "Em instantes, seu sistema completo será gerado — interface, servidor e painel de controle inclusos.",
         imageUrl: null,
-        icon: Code
+        icon: null,
+        customComponent: <ExampleSitePreview />
     },
     {
         title: "Publique e Lucre",

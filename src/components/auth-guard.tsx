@@ -30,8 +30,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         // Not logged in, redirect to login
         router.push('/login');
       } else if (userProfile?.plan === 'Pendente') {
-        // User's plan is pending, redirect to verification page
-        router.push('/verificacao');
+        // User's plan is pending, redirect them back to login. 
+        // The login page will show the verification popup.
+        router.push('/login');
       }
     }
   }, [isUserLoading, isProfileLoading, user, userProfile, router]);

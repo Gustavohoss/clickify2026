@@ -11,6 +11,8 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
+  Hourglass,
+  MessageCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,9 +23,12 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   updateProfile,
+  User as FirebaseUser,
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { setDoc, doc, serverTimestamp, getDoc } from 'firebase/firestore';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from '@/components/ui/alert-dialog';
+
 
 const GoogleIcon = () => (
     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -42,8 +47,20 @@ export default function LoginPage() {
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showVerificationPopup, setShowVerificationPopup] = useState(false);
   const { auth, firestore } = useFirebase();
   const router = useRouter();
+
+  const checkUserPlanAndRedirect = async (user: FirebaseUser) => {
+      const userDocRef = doc(firestore, 'users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists() && userDocSnap.data().plan === 'Pendente') {
+          setShowVerificationPopup(true);
+      } else {
+          router.push('/painel');
+      }
+  };
 
   const handleAuth = async () => {
     setLoading(true);
@@ -60,15 +77,9 @@ export default function LoginPage() {
         return;
     }
 
-
     try {
-      let userCredential;
       if (isSignUp) {
-        userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         await updateProfile(user, { displayName });
         await setDoc(doc(firestore, 'users', user.uid), {
@@ -78,11 +89,12 @@ export default function LoginPage() {
             createdAt: serverTimestamp(),
             plan: 'Pendente',
         });
-
+        // After sign up, show verification popup
+        setShowVerificationPopup(true);
       } else {
-        userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        await checkUserPlanAndRedirect(userCredential.user);
       }
-      router.push('/painel');
     } catch (err: any) {
       setError(getFriendlyErrorMessage(err.code));
     } finally {
@@ -102,7 +114,7 @@ export default function LoginPage() {
       const userDocSnap = await getDoc(userDocRef);
 
       if (!userDocSnap.exists()) {
-        // New user signing in with Google
+        // New user signing in with Google, set plan to Pendente
         await setDoc(userDocRef, {
             id: user.uid,
             email: user.email,
@@ -111,9 +123,8 @@ export default function LoginPage() {
             plan: 'Pendente',
         });
       }
-      // Existing user, just log them in. Their plan is already set.
-
-      router.push('/painel');
+      // For both new and existing users, check their plan
+      await checkUserPlanAndRedirect(user);
     } catch (err: any) {
       setError(getFriendlyErrorMessage(err.code));
     } finally {
@@ -149,6 +160,7 @@ export default function LoginPage() {
   }
 
   return (
+    <>
     <div className="flex items-center justify-center min-h-screen bg-black text-white relative overflow-hidden">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
@@ -280,6 +292,42 @@ export default function LoginPage() {
 
       </motion.div>
     </div>
+
+    <AlertDialog open={showVerificationPopup} onOpenChange={setShowVerificationPopup}>
+      <AlertDialogContent className="bg-[#0E101B] border-[#2A2D3C] text-white">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-center text-2xl flex flex-col items-center gap-4">
+             <Hourglass className="h-12 w-12 text-blue-400" />
+            Conta em Verificação
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-center text-sm text-gray-400 !mt-4 space-y-2">
+            <p>Sua conta está sendo verificada para garantir a segurança e evitar robôs. Este processo pode levar até 1 hora. Agradecemos a sua paciência!</p>
+            <p>Caso demore mais que o esperado, entre em contato com a nossa equipe.</p>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
+          <Button
+            variant="outline"
+            className="w-full border-gray-600 hover:bg-gray-800 text-white"
+            onClick={() => setShowVerificationPopup(false)}
+          >
+            Entendi
+          </Button>
+          <a
+            href="https://wa.me/55DDYYYYYXXXX" // Substitua pelo seu número do WhatsApp
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full"
+          >
+            <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Entrar em contato
+            </Button>
+          </a>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </>
   );
 }
 

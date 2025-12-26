@@ -23,9 +23,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
 
   useEffect(() => {
-    const isAuthenticating = isUserLoading || isProfileLoading;
+    const isCheckingAuth = isUserLoading || (user && isProfileLoading);
 
-    if (!isAuthenticating) {
+    if (!isCheckingAuth) {
       if (!user) {
         // Not logged in, redirect to login
         router.push('/login');
@@ -38,7 +38,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [isUserLoading, isProfileLoading, user, userProfile, router]);
   
   const isAuthenticating = isUserLoading || (user && isProfileLoading);
-  const isAccessDenied = !user || userProfile?.plan === 'Pendente';
+  const isAccessDenied = !isAuthenticating && (!user || userProfile?.plan === 'Pendente');
 
   if (isAuthenticating || isAccessDenied) {
      return (

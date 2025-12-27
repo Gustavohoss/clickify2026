@@ -1,9 +1,9 @@
 
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowLeft, Copy, Check, Handshake, Store, UtensilsCrossed, Megaphone, Scale, Calculator, Building, Sparkles as SparklesIcon, Dumbbell, Code, Camera, Scissors } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Handshake, Store, UtensilsCrossed, Megaphone, Scale, Calculator, Building, Sparkles as SparklesIcon, Dumbbell, Code, Camera, Scissors, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Input } from '@/components/ui/input';
 
 
 const approachTemplates = [
@@ -108,6 +109,16 @@ const CopyButton = ({ textToCopy }: { textToCopy: string }) => {
 }
 
 export default function AbordagemPage() {
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredTemplates = useMemo(() => {
+        if (!searchTerm) {
+            return approachTemplates;
+        }
+        return approachTemplates.filter(template =>
+            template.category.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [searchTerm]);
 
     return (
         <main className="p-4 md:p-10 min-h-screen bg-black text-white relative overflow-hidden">
@@ -134,7 +145,7 @@ export default function AbordagemPage() {
                     transition={{ duration: 0.6, ease: 'easeOut' }}
                     className="pt-16"
                 >
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
                             Modelos de Abordagem
                         </h1>
@@ -142,14 +153,24 @@ export default function AbordagemPage() {
                     </div>
 
                      <motion.div 
-                        className="p-6 space-y-4 bg-zinc-900/40 border border-zinc-800/80 backdrop-blur-sm rounded-lg"
+                        className="p-6 space-y-6 bg-zinc-900/40 border border-zinc-800/80 backdrop-blur-sm rounded-lg"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
                     >
+                         <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                            <Input
+                                placeholder="Pesquisar por tipo de negócio..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 bg-zinc-800/50 border-zinc-700 focus:border-purple-500"
+                            />
+                        </div>
+
                          <Accordion type="single" collapsible className="w-full">
-                            {approachTemplates.map((template, index) => (
-                                 <AccordionItem key={index} value={`item-${index}`} className={cn("border-zinc-800", index === approachTemplates.length - 1 && 'border-b-0')}>
+                            {filteredTemplates.map((template, index) => (
+                                 <AccordionItem key={index} value={`item-${index}`} className={cn("border-zinc-800", index === filteredTemplates.length - 1 && 'border-b-0')}>
                                     <AccordionTrigger className="hover:no-underline text-lg font-semibold text-zinc-200 hover:text-white transition-colors py-5">
                                         <div className="flex items-center gap-3">
                                             {template.icon}
@@ -167,6 +188,11 @@ export default function AbordagemPage() {
                                 </AccordionItem>
                             ))}
                         </Accordion>
+                        {filteredTemplates.length === 0 && (
+                            <div className="text-center py-10 text-zinc-500">
+                                <p>Nenhum modelo encontrado para &quot;{searchTerm}&quot;.</p>
+                            </div>
+                        )}
                     </motion.div>
                 </motion.div>
             </div>

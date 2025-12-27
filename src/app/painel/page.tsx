@@ -1,7 +1,7 @@
 
 'use client';
 
-import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2, Users } from 'lucide-react';
+import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2, Users, Copy, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import AuthGuard from '@/components/auth-guard';
@@ -16,8 +16,63 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Spotlight } from '@/components/ui/spotlight';
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { toast } from '@/hooks/use-toast';
+
+function InviteDialog() {
+    const [copied, setCopied] = useState(false);
+    
+    // In a real app, this would come from a dynamic source
+    const inviteLink = `${window.location.origin}/equipe`;
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(inviteLink);
+        setCopied(true);
+        toast({
+            title: "Link Copiado!",
+            description: "O link de convite foi copiado para sua área de transferência.",
+        });
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <DialogContent className="bg-zinc-900/80 backdrop-blur-lg border-zinc-800 text-white sm:max-w-[425px]">
+            <DialogHeader>
+                <DialogTitle className="text-white">Convide sua Equipe</DialogTitle>
+                <DialogDescription className="text-zinc-400">
+                    Você tem 3 convites restantes. Compartilhe o link abaixo para que seus amigos aproveitem a oferta especial.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center space-x-2 my-4">
+                <Input
+                    id="invite-link"
+                    value={inviteLink}
+                    readOnly
+                    className="flex-1 bg-zinc-800 border-zinc-700 text-zinc-300"
+                />
+                <Button type="button" size="sm" className="px-3" onClick={handleCopy}>
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+            </div>
+             <DialogFooter>
+                <p className="text-xs text-zinc-500">O link dá acesso a um plano Vitalício com desconto exclusivo.</p>
+            </DialogFooter>
+        </DialogContent>
+    );
+}
+
 
 function Header() {
   const { auth } = useFirebase();
@@ -44,43 +99,47 @@ function Header() {
         <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
           CLICKIFY
         </h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar className="h-10 w-10 border-2 border-white/10">
-                <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
-                <AvatarFallback className="bg-purple-800/60 text-white font-bold">
-                  {getInitials(user?.displayName)}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 bg-black/80 backdrop-blur-lg border-zinc-800 text-white" align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user?.displayName}</p>
-                <p className="text-xs leading-none text-zinc-400">{user?.email}</p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-zinc-800" />
-            <Link href="/equipe" passHref>
+        <Dialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Avatar className="h-10 w-10 border-2 border-white/10">
+                  <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                  <AvatarFallback className="bg-purple-800/60 text-white font-bold">
+                    {getInitials(user?.displayName)}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-black/80 backdrop-blur-lg border-zinc-800 text-white" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.displayName}</p>
+                  <p className="text-xs leading-none text-zinc-400">{user?.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DialogTrigger asChild>
+                 <DropdownMenuItem
+                  onSelect={(e) => e.preventDefault()}
+                  className="cursor-pointer focus:bg-zinc-800 focus:text-white"
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Convite para Equipe</span>
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem
+                onClick={handleSignOut}
                 className="cursor-pointer focus:bg-zinc-800 focus:text-white"
               >
-                <Users className="mr-2 h-4 w-4" />
-                <span>Convite para Equipe</span>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
               </DropdownMenuItem>
-            </Link>
-            <DropdownMenuSeparator className="bg-zinc-800" />
-            <DropdownMenuItem
-              onClick={handleSignOut}
-              className="cursor-pointer focus:bg-zinc-800 focus:text-white"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Sair</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <InviteDialog />
+        </Dialog>
       </div>
     </header>
   );
@@ -289,3 +348,5 @@ export default function PainelPage() {
         </AuthGuard>
     );
 }
+
+    

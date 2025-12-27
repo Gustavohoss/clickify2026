@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowLeft, Copy, Check, Handshake, Store, UtensilsCrossed, Megaphone, Scale, Calculator, Building, Sparkles as SparklesIcon, Dumbbell, Code, Camera, Scissors, Search, Dog, Coffee, Landmark, Briefcase, Palette, Car, Shield, Languages, Pencil, Calendar, HeartPulse, BrainCircuit, Smartphone, Flower, DiscAlbum, DraftingCompass, Plane, ShoppingCart, Award, Mic, Wrench } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Handshake, Store, UtensilsCrossed, Megaphone, Scale, Calculator, Building, Sparkles as SparklesIcon, Dumbbell, Code, Camera, Scissors, Search, Dog, Coffee, Landmark, Briefcase, Palette, Car, Shield, Languages, Pencil, Calendar, HeartPulse, BrainCircuit, Smartphone, Flower, DiscAlbum, DraftingCompass, Plane, ShoppingCart, Award, Mic, Wrench, ChefHat, Glasses, BookOpen, PartyPopper, Lotus, Construction, Stethoscope, AudioLines, Bot, Sprout, SprayCan, HandHelping, Printer, Music, Footprints, ShieldCheck, Beer, WashingMachine, Truck, Users, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -181,6 +181,106 @@ const approachTemplates = [
         category: 'Mecânica',
         icon: <Wrench className="w-5 h-5 text-slate-500" />,
         message: `Olá, [Nome do Contato], tudo bem? Meu nome é [Seu Nome].\n\nVi a [Nome da Mecânica] e a boa avaliação de vocês na região.\n\nNós temos um sistema que ajuda mecânicas a [Problema que Resolve, ex: enviar atualizações do serviço por WhatsApp com fotos e vídeos para o cliente], gerando muito mais transparência e confiança.\n\nIsso [Benefício, ex: aumenta a satisfação e a fidelização]. Podemos agendar uma conversa de 15 minutos para que eu possa apresentar a solução?`
+    },
+    {
+        category: 'Padaria',
+        icon: <ChefHat className="w-5 h-5 text-orange-300" />,
+        message: `Olá, [Nome do Contato]! Meu nome é [Seu Nome].\n\nSou cliente da [Nome da Padaria] e adoro os produtos de vocês! Tenho uma solução que ajuda padarias a [Principal Problema que Resolve, ex: criar um programa de fidelidade] e a [Benefício, ex: aumentar as vendas recorrentes].\n\nGostaria de mostrar como podemos fazer a [Nome da Padaria] vender ainda mais. Podemos conversar por 10 minutos?`
+    },
+    {
+        category: 'Ótica',
+        icon: <Glasses className="w-5 h-5 text-sky-400" />,
+        message: `Olá, [Nome do Contato], tudo bem? Sou [Seu Nome].\n\nVi a [Nome da Ótica] e a variedade de armações de vocês. Tenho uma ferramenta que permite que clientes [Funcionalidade, ex: experimentem as armações virtualmente usando a câmera].\n\nIsso ajuda a [Benefício, ex: aumentar a conversão e a confiança na compra online]. Teria 15 minutos para eu apresentar a tecnologia?`
+    },
+    {
+        category: 'Livraria',
+        icon: <BookOpen className="w-5 h-5 text-amber-800" />,
+        message: `Prezado(a) [Nome do Contato],\n\nMeu nome é [Seu Nome] e sou um apaixonado por livros. Admiro o trabalho da [Nome da Livraria].\n\nNós criamos uma plataforma para livrarias que [Funcionalidade, ex: gerencia um clube do livro online], criando uma comunidade engajada e [Benefício, ex: aumentando a receita recorrente].\n\nSeria um prazer apresentar a ideia. Você teria um momento para conversarmos?`
+    },
+    {
+        category: 'Agência de Eventos',
+        icon: <PartyPopper className="w-5 h-5 text-rose-500" />,
+        message: `Olá, [Nome do Contato]! Sou [Seu Nome].\n\nOs eventos da [Nome da Agência] são incríveis! Vi a organização do [Nome do Evento] e fiquei impressionado.\n\nNossa plataforma ajuda agências a [Problema que Resolve, ex: gerenciar o credenciamento e a comunicação com os participantes de forma automatizada], garantindo um [Benefício, ex: evento mais fluido e profissional].\n\nVamos marcar uma conversa rápida para eu te mostrar como funciona?`
+    },
+    {
+        category: 'Estúdio de Yoga/Pilates',
+        icon: <Lotus className="w-5 h-5 text-teal-300" />,
+        message: `Oi, [Nome do Contato], tudo bem? Meu nome é [Seu Nome].\n\nAdmiro a paz e o bem-estar que a [Nome do Estúdio] proporciona.\n\nNós temos um app que ajuda estúdios a [Problema que Resolve, ex: gerenciar as aulas, as mensalidades e oferecer conteúdo online para os alunos]. O objetivo é [Benefício, ex: aumentar a retenção e criar uma nova fonte de receita].\n\nGostaria de te apresentar. Podemos agendar?`
+    },
+    {
+        category: 'Construtora',
+        icon: <Construction className="w-5 h-5 text-yellow-600" />,
+        message: `Prezado(a) [Nome do Contato],\n\nMeu nome é [Seu Nome] e sou especialista em soluções para a construção civil.\n\nVi a qualidade dos empreendimentos da [Nome da Construtora]. Nossa plataforma ajuda construtoras a [Problema que Resolve, ex: acompanhar o andamento da obra com relatórios fotográficos diários para os clientes], aumentando a [Benefício, ex: transparência e a satisfação do cliente].\n\nPodemos agendar uma demonstração de 15 minutos?`
+    },
+    {
+        category: 'Clínica Veterinária',
+        icon: <Stethoscope className="w-5 h-5 text-red-500" />,
+        message: `Olá, Dr(a). [Nome do Contato]. Meu nome é [Seu Nome].\n\nVi o excelente trabalho que vocês fazem na [Nome da Clínica Veterinária].\n\nNós temos um sistema que [Funcionalidade, ex: automatiza o envio de lembretes de vacinas e consultas para os tutores via WhatsApp], o que [Benefício, ex: diminui o no-show e aumenta o cuidado contínuo com os pets].\n\nSeria um prazer apresentar a ferramenta. Qual o melhor horário para você?`
+    },
+    {
+        category: 'Estúdio de Gravação',
+        icon: <AudioLines className="w-5 h-5 text-blue-600" />,
+        message: `Fala, [Nome do Contato]! Sou [Seu Nome].\n\nVi a qualidade dos trabalhos que saem do [Nome do Estúdio]. O som é impecável!\n\nDesenvolvemos um sistema que ajuda estúdios a [Problema que Resolve, ex: gerenciar a agenda de gravações e os pagamentos de forma online], para que você possa focar 100% no som.\n\nTopa uma call de 10 min pra eu te mostrar como funciona?`
+    },
+    {
+        category: 'Loja de Suplementos',
+        icon: <Bot className="w-5 h-5 text-lime-400" />,
+        message: `Olá, [Nome do Contato], tudo bem? Meu nome é [Seu Nome].\n\nVi que a [Nome da Loja] tem uma excelente variedade de suplementos.\n\nNós temos uma ferramenta de IA que [Funcionalidade, ex: cria recomendações de combos de suplementos com base nos objetivos do cliente], o que [Benefício, ex: aumenta o ticket médio e a satisfação do cliente].\n\nGostaria de te mostrar como isso pode impulsionar suas vendas. Podemos conversar?`
+    },
+    {
+        category: 'Empresa de Limpeza',
+        icon: <SprayCan className="w-5 h-5 text-cyan-400" />,
+        message: `Prezado(a) [Nome do Contato],\n\nMeu nome é [Seu Nome]. Vi a reputação da [Nome da Empresa] na prestação de serviços de limpeza.\n\nNossa plataforma ajuda empresas do setor a [Problema que Resolve, ex: gerenciar as equipes em campo e automatizar os orçamentos para novos clientes], otimizando a [Benefício, ex: logística e o tempo de resposta].\n\nPodemos agendar uma breve apresentação da solução?`
+    },
+    {
+        category: 'Consultoria de RH',
+        icon: <HandHelping className="w-5 h-5 text-indigo-500" />,
+        message: `Olá, [Nome do Contato]. Meu nome é [Seu Nome].\n\nAcompanho o trabalho da [Nome da Consultoria] e a expertise de vocês em recrutamento é notável.\n\nNós temos uma ferramenta que [Problema que Resolve, ex: automatiza a triagem inicial de currículos com base em IA], permitindo que seus consultores foquem em [Benefício, ex: candidatos mais qualificados e entrevistas estratégicas].\n\nSeria ótimo te mostrar como podemos otimizar seu processo. Teria 15 minutos?`
+    },
+    {
+        category: 'Gráfica Rápida',
+        icon: <Printer className="w-5 h-5 text-gray-500" />,
+        message: `Oi, [Nome do Contato]. Sou [Seu Nome].\n\nVi a qualidade dos impressos da [Nome da Gráfica].\n\nTrabalhamos com um sistema de e-commerce para gráficas que [Funcionalidade, ex: permite que o cliente faça o upload do arquivo, escolha o acabamento e pague online], o que [Benefício, ex: automatiza todo o fluxo de pedido e aumenta as vendas online].\n\nAdoraria apresentar para você. Podemos marcar um horário?`
+    },
+    {
+        category: 'Loja de Instrumentos Musicais',
+        icon: <Music className="w-5 h-5 text-fuchsia-400" />,
+        message: `Fala, [Nome do Contato]! Beleza? Sou [Seu Nome].\n\nVi que a [Nome da Loja] tem uma seleção incrível de [Tipo de Instrumento].\n\nTenho uma ideia para ajudar vocês a [Problema que Resolve, ex: criar conteúdo em vídeo demonstrando os instrumentos], o que pode [Benefício, ex: aumentar o engajamento nas redes sociais e atrair mais clientes para a loja].\n\nTopa bater um papo rápido sobre essa parceria?`
+    },
+    {
+        category: 'Estúdio de Dança',
+        icon: <Footprints className="w-5 h-5 text-pink-400" />,
+        message: `Olá, [Nome do Contato]! Sou [Seu Nome].\n\nVi a energia contagiante das aulas na [Nome do Estúdio de Dança]!\n\nNós temos um sistema que ajuda estúdios a [Problema que Resolve, ex: vender pacotes de aulas online e gerenciar a presença dos alunos], tornando a [Benefício, ex: administração mais simples e aumentando o faturamento].\n\nGostaria de te apresentar. Podemos agendar uma conversa?`
+    },
+    {
+        category: 'Empresa de Segurança',
+        icon: <ShieldCheck className="w-5 h-5 text-blue-800" />,
+        message: `Prezado(a) [Nome do Contato],\n\nMeu nome é [Seu Nome]. Vi a seriedade e o profissionalismo da [Nome da Empresa de Segurança].\n\nNossa solução de tecnologia ajuda empresas do setor a [Problema que Resolve, ex: monitorar as equipes em tempo real e gerar relatórios de ocorrência digitais], garantindo [Benefício, ex: mais controle e eficiência para seus clientes].\n\nPodemos agendar uma demonstração de 15 minutos?`
+    },
+    {
+        category: 'Cervejaria Artesanal',
+        icon: <Beer className="w-5 h-5 text-amber-500" />,
+        message: `E aí, [Nome do Contato]! Sou [Seu Nome] e fã das cervejas da [Nome da Cervejaria].\n\nTenho uma solução que ajuda cervejarias a [Problema que Resolve, ex: criar um clube de assinatura para receber lançamentos em primeira mão], o que [Benefício, ex: gera receita recorrente e uma base de fãs fiéis].\n\nTopa conversar por 10 minutos sobre como podemos fazer isso acontecer?`
+    },
+    {
+        category: 'Lavanderia',
+        icon: <WashingMachine className="w-5 h-5 text-sky-600" />,
+        message: `Olá, [Nome do Contato], tudo bem?\n\nMeu nome é [Seu Nome]. Sei que a praticidade é tudo para os clientes da [Nome da Lavanderia].\n\nNós temos um aplicativo que [Funcionalidade, ex: permite que os clientes agendem a coleta e entrega de roupas em casa], oferecendo [Benefício, ex: muito mais conveniência e aumentando a fidelização].\n\nSeria ótimo te apresentar a ideia. Podemos marcar um horário?`
+    },
+    {
+        category: 'Transportadora',
+        icon: <Truck className="w-5 h-5 text-slate-600" />,
+        message: `Prezado(a) [Nome do Contato],\n\nMeu nome é [Seu Nome] e trabalho com tecnologia para logística.\n\nVi a eficiência da [Nome da Transportadora]. Nossa plataforma ajuda transportadoras a [Problema que Resolve, ex: otimizar rotas de entrega em tempo real e oferecer rastreamento preciso para o cliente final], o que resulta em [Benefício, ex: economia de combustível e maior satisfação do cliente].\n\nPodemos agendar uma breve demonstração?`
+    },
+    {
+        category: 'Escritório de Coworking',
+        icon: <Users className="w-5 h-5 text-violet-400" />,
+        message: `Olá, [Nome do Contato]! Sou [Seu Nome].\n\nAdorei o ambiente do [Nome do Coworking]. É muito inspirador!\n\nNós temos um sistema que ajuda coworkings a [Problema que Resolve, ex: gerenciar a reserva de salas e posições de trabalho de forma 100% online], simplificando a [Benefício, ex: vida dos membros e a gestão do espaço].\n\nGostaria de te mostrar como funciona. Tem 15 minutos disponíveis?`
+    },
+    {
+        category: 'Desenvolvedor de Jogos Indie',
+        icon: <Gamepad2 className="w-5 h-5 text-green-500" />,
+        message: `Fala, [Nome do Contato]! Beleza? Sou [Seu Nome].\n\nVi seu jogo [Nome do Jogo] na Steam e curti demais a arte/mecânica! Trabalho incrível.\n\nTenho uma ferramenta que ajuda devs a [Problema que Resolve, ex: coletar feedback dos jogadores e gerenciar uma comunidade no Discord], para você focar no desenvolvimento.\n\nTopa uma call rápida pra eu te mostrar? Sem compromisso.`
     }
 ];
 

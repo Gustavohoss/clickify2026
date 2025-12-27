@@ -306,7 +306,7 @@ function PainelContent() {
                       Abordagem de Empresas
                     </h2>
                     <p className="text-white/40 mt-2">
-                      Deixe abordagens prontas, para todos os tipos de negocios que vc conseguir criar
+                      Modelos de mensagens e scripts para prospecção.
                     </p>
                   </div>
                   <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">

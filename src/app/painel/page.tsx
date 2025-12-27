@@ -35,7 +35,6 @@ function InviteDialog() {
     const [copied, setCopied] = useState(false);
     const { toast } = useToast();
     
-    // In a real app, this would come from a dynamic source
     const inviteLink = typeof window !== 'undefined' ? `${window.location.origin}/equipe` : '';
 
     const handleCopy = () => {
@@ -49,27 +48,35 @@ function InviteDialog() {
     };
 
     return (
-        <DialogContent className="bg-zinc-900/80 backdrop-blur-lg border-zinc-800 text-white sm:max-w-[425px]">
-            <DialogHeader>
-                <DialogTitle className="text-white text-lg font-bold">Convide sua Equipe</DialogTitle>
-                <DialogDescription className="text-zinc-400">
-                    Você tem 3 convites restantes. Compartilhe o link abaixo para que seus amigos aproveitem a oferta especial.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="flex items-center space-x-2 my-4">
-                <Input
-                    id="invite-link"
-                    value={inviteLink}
-                    readOnly
-                    className="flex-1 bg-zinc-800 border-zinc-700 text-zinc-300 h-9"
-                />
-                <Button type="button" size="sm" className="px-2.5 h-9 bg-primary hover:bg-primary/90" onClick={handleCopy}>
-                    {copied ? <Check className="h-4 w-4 text-white" /> : <Copy className="h-4 w-4 text-white" />}
-                </Button>
-            </div>
-             <DialogFooter>
-                <p className="text-xs text-zinc-500 text-center w-full">O link dá acesso a um plano Vitalício com desconto exclusivo.</p>
-            </DialogFooter>
+        <DialogContent className="bg-transparent p-0 border-0 sm:max-w-[480px]">
+          <div className="group relative p-6 rounded-2xl overflow-hidden bg-background/80 backdrop-blur-xl border border-primary/20 shadow-2xl shadow-primary/20">
+              <Spotlight
+                  className="-top-20 -left-20 md:left-0 md:-top-10"
+                  fill={'#a855f7'}
+              />
+              <div className="relative z-10">
+                  <DialogHeader>
+                      <DialogTitle className="text-white text-xl font-bold">Convide sua Equipe</DialogTitle>
+                      <DialogDescription className="text-zinc-400 pt-1">
+                          Você tem 3 convites restantes. Compartilhe o link abaixo para que seus amigos aproveitem a oferta especial.
+                      </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex items-center space-x-2 my-6">
+                      <Input
+                          id="invite-link"
+                          value={inviteLink}
+                          readOnly
+                          className="flex-1 bg-zinc-900/50 border-zinc-700/80 text-zinc-300 h-10"
+                      />
+                      <Button type="button" size="sm" className="px-3 h-10 bg-primary hover:bg-primary/90" onClick={handleCopy}>
+                          {copied ? <Check className="h-5 w-5 text-white" /> : <Copy className="h-5 w-5 text-white" />}
+                      </Button>
+                  </div>
+                  <DialogFooter>
+                      <p className="text-xs text-zinc-500 text-center w-full">O link dá acesso a um plano Vitalício com desconto exclusivo.</p>
+                  </DialogFooter>
+              </div>
+          </div>
         </DialogContent>
     );
 }

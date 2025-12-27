@@ -1,7 +1,7 @@
 
 'use client';
 
-import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2 } from 'lucide-react';
+import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import AuthGuard from '@/components/auth-guard';
@@ -62,6 +62,15 @@ function Header() {
                 <p className="text-xs leading-none text-zinc-400">{user?.email}</p>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-zinc-800" />
+            <Link href="/equipe" passHref>
+              <DropdownMenuItem
+                className="cursor-pointer focus:bg-zinc-800 focus:text-white"
+              >
+                <Users className="mr-2 h-4 w-4" />
+                <span>Convite para Equipe</span>
+              </DropdownMenuItem>
+            </Link>
             <DropdownMenuSeparator className="bg-zinc-800" />
             <DropdownMenuItem
               onClick={handleSignOut}

@@ -29,13 +29,14 @@ import { Button } from '@/components/ui/button';
 import { Spotlight } from '@/components/ui/spotlight';
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 function InviteDialog() {
     const [copied, setCopied] = useState(false);
+    const { toast } = useToast();
     
     // In a real app, this would come from a dynamic source
-    const inviteLink = `${window.location.origin}/equipe`;
+    const inviteLink = typeof window !== 'undefined' ? `${window.location.origin}/equipe` : '';
 
     const handleCopy = () => {
         navigator.clipboard.writeText(inviteLink);
@@ -50,7 +51,7 @@ function InviteDialog() {
     return (
         <DialogContent className="bg-zinc-900/80 backdrop-blur-lg border-zinc-800 text-white sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle className="text-white">Convide sua Equipe</DialogTitle>
+                <DialogTitle className="text-white text-lg font-bold">Convide sua Equipe</DialogTitle>
                 <DialogDescription className="text-zinc-400">
                     Você tem 3 convites restantes. Compartilhe o link abaixo para que seus amigos aproveitem a oferta especial.
                 </DialogDescription>
@@ -60,14 +61,14 @@ function InviteDialog() {
                     id="invite-link"
                     value={inviteLink}
                     readOnly
-                    className="flex-1 bg-zinc-800 border-zinc-700 text-zinc-300"
+                    className="flex-1 bg-zinc-800 border-zinc-700 text-zinc-300 h-9"
                 />
-                <Button type="button" size="sm" className="px-3" onClick={handleCopy}>
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                <Button type="button" size="sm" className="px-2.5 h-9 bg-primary hover:bg-primary/90" onClick={handleCopy}>
+                    {copied ? <Check className="h-4 w-4 text-white" /> : <Copy className="h-4 w-4 text-white" />}
                 </Button>
             </div>
              <DialogFooter>
-                <p className="text-xs text-zinc-500">O link dá acesso a um plano Vitalício com desconto exclusivo.</p>
+                <p className="text-xs text-zinc-500 text-center w-full">O link dá acesso a um plano Vitalício com desconto exclusivo.</p>
             </DialogFooter>
         </DialogContent>
     );
@@ -349,4 +350,3 @@ export default function PainelPage() {
     );
 }
 
-    

@@ -24,7 +24,7 @@ export function LocationMap({
   className,
 }: LocationMapProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(true) // Always expanded
   const containerRef = useRef<HTMLDivElement>(null)
 
   const mouseX = useMotionValue(0)
@@ -51,7 +51,7 @@ export function LocationMap({
   }
 
   const handleClick = () => {
-    setIsExpanded(!isExpanded)
+    // setIsExpanded(!isExpanded) // Click functionality removed
   }
 
   return (
@@ -74,7 +74,7 @@ export function LocationMap({
           transformStyle: "preserve-3d",
         }}
         animate={{
-          height: isExpanded ? "auto" : 140,
+          height: "auto",
         }}
         transition={{
           type: "spring",
@@ -101,17 +101,7 @@ export function LocationMap({
             </motion.div>
           </div>
 
-          {/* Collapsed content placeholder */}
-           <motion.div 
-            animate={{ opacity: isExpanded ? 0 : 1, height: isExpanded ? 0 : 'auto' }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="space-y-1 overflow-hidden"
-          >
-              <div className="w-3/4 h-2 bg-zinc-700/50 rounded-full" />
-              <div className="w-1/2 h-2 bg-zinc-700/50 rounded-full" />
-          </motion.div>
-
-          <AnimatePresence>
+           <AnimatePresence>
             {isExpanded && (
                 <motion.div
                   className="space-y-3 text-sm mt-4"
@@ -172,19 +162,6 @@ export function LocationMap({
         </div>
 
       </motion.div>
-
-      <motion.p
-        className="absolute -bottom-6 left-1/2 text-[10px] text-muted-foreground whitespace-nowrap"
-        style={{ x: "-50%" }}
-        initial={{ opacity: 0 }}
-        animate={{
-          opacity: isHovered && !isExpanded ? 1 : 0,
-          y: isHovered ? 0 : 4,
-        }}
-        transition={{ duration: 0.2 }}
-      >
-        Click to expand
-      </motion.p>
     </motion.div>
   )
 }

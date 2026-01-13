@@ -11,10 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose, SheetFooter, SheetDescription } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -32,7 +31,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-
 
 import { 
     Loader2, 
@@ -118,11 +116,8 @@ const getInitials = (name: string) => {
 
 const formatPhoneNumberForWhatsApp = (phone: string | null): string => {
     if (!phone) return '';
-    // Remove all non-digit characters
     let cleaned = phone.replace(/\D/g, '');
-    // Ensure it starts with 55 (Brazil's country code)
     if (cleaned.length === 10 || cleaned.length === 11) {
-        // Assume it's a Brazilian number without country code, add 55
         cleaned = '55' + cleaned;
     }
     return `https://wa.me/${cleaned}`;
@@ -167,7 +162,7 @@ function LeadsContent() {
     
     const kpis = useMemo(() => {
         if (!leads) return { total: 0, negociacao: 0, fechado: 0 };
-        const fechadoValor = leads.reduce((acc, lead) => lead.status === 'Fechado' ? acc + lead.valorContrato : acc, 0);
+        const fechadoValor = leads.reduce((acc, lead) => lead.status === 'Fechado' ? acc + (lead.valorContrato || 0) : acc, 0);
         return {
             total: leads.length,
             negociacao: leads.filter(l => l.status === 'Em Negociação').length,
@@ -259,17 +254,17 @@ function LeadsContent() {
                 lead.status,
                 lead.telefone || '',
                 lead.site || '',
-                `"${lead.endereco?.replace(/"/g, '""') || ''}"`,
-                lead.valorContrato,
+                `"${(lead.endereco || '').replace(/"/g, '""')}"`,
+                lead.valorContrato || 0,
                 lead.ultimaInteracao ? format(lead.ultimaInteracao.toDate(), 'yyyy-MM-dd HH:mm:ss') : '',
                 lead.createdAt ? format(lead.createdAt.toDate(), 'yyyy-MM-dd HH:mm:ss') : '',
-                `"${lead.notes?.replace(/"/g, '""') || ''}"`
+                `"${(lead.notes || '').replace(/"/g, '""')}"`
             ];
             csvRows.push(row.join(','));
         });
 
         const csvString = csvRows.join('\n');
-        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([`\uFEFF${csvString}`], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         if (link.download !== undefined) {
             const url = URL.createObjectURL(blob);
@@ -285,7 +280,7 @@ function LeadsContent() {
 
 
     const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
     }
     
     return (
@@ -420,7 +415,7 @@ function LeadsContent() {
                             <TableRow className="border-zinc-800 hover:bg-zinc-900/50">
                                 <TableHead className="w-12">
                                     <Checkbox 
-                                        checked={selectedLeads.length === filteredLeads.length && filteredLeads.length > 0}
+                                        checked={filteredLeads.length > 0 && selectedLeads.length === filteredLeads.length}
                                         onCheckedChange={handleSelectAll}
                                     />
                                 </TableHead>

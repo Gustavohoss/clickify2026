@@ -60,13 +60,18 @@ type Lead = {
   valorContrato: number;
   ultimaInteracao: Timestamp;
   createdAt: Timestamp;
+  ownerId: string;
 };
 
 // Componente para evitar erros de hidratação com datas
-const ClientTime = ({ date }: { date: Timestamp | Date }) => {
+const ClientTime = ({ date }: { date: Timestamp | Date | undefined }) => {
     const [formattedDate, setFormattedDate] = useState('');
   
     useEffect(() => {
+        if (!date) {
+            setFormattedDate('Nunca');
+            return;
+        };
         const jsDate = date instanceof Timestamp ? date.toDate() : date;
         setFormattedDate(formatDistanceToNow(jsDate, { addSuffix: true, locale: ptBR }));
     }, [date]);
@@ -88,16 +93,18 @@ const statusColors = {
 const EditLeadDialog = ({ lead, onSave }: { lead: Lead; onSave: () => void }) => {
     const [nome, setNome] = useState(lead.nome);
     const [status, setStatus] = useState(lead.status);
-    const [valorContrato, setValorContrato] = useState(lead.valorContrato.toString());
-    const [notes, setNotes] = useState(lead.notes);
+    const [valorContrato, setValorContrato] = useState(lead.valorContrato?.toString() ?? '0');
+    const [notes, setNotes] = useState(lead.notes ?? '');
     const [isSaving, setIsSaving] = useState(false);
     const { toast } = useToast();
     const { firestore } = useFirebase();
+    const { user } = useUser();
 
     const handleSave = async () => {
+        if (!user) return;
         setIsSaving(true);
         try {
-            const leadRef = doc(firestore, `users/${lead.ownerId}/leads/${lead.id}`);
+            const leadRef = doc(firestore, `users/${user.uid}/leads/${lead.id}`);
             await updateDoc(leadRef, {
                 nome,
                 status,
@@ -155,7 +162,7 @@ export default function LeadsPage() {
     return collection(firestore, `users/${user.uid}/leads`);
   }, [user, firestore]);
 
-  const { data: leads, isLoading, error } = useCollection<Lead>(leadsQuery as any);
+  const { data: leads, isLoading, error } = useCollection<Lead>(leadsQuery);
 
   const filteredLeads = useMemo(() => {
     if (!leads) return [];
@@ -178,7 +185,7 @@ export default function LeadsPage() {
   };
   
   const exportToCSV = () => {
-    if (!filteredLeads.length) return;
+    if (!filteredLeads || filteredLeads.length === 0) return;
     const headers = ['Nome', 'Status', 'Telefone', 'Site', 'Endereço', 'Valor Contrato', 'Anotações', 'Última Interação'];
     const rows = filteredLeads.map(lead => [
         `"${lead.nome || ''}"`,
@@ -186,9 +193,9 @@ export default function LeadsPage() {
         `"${lead.telefone || ''}"`,
         `"${lead.site || ''}"`,
         `"${(lead.endereco || '').replace(/"/g, '""')}"`,
-        lead.valorContrato,
+        lead.valorContrato || 0,
         `"${(lead.notes || '').replace(/"/g, '""')}"`,
-        `"${lead.ultimaInteracao.toDate().toLocaleString()}"`
+        `"${lead.ultimaInteracao ? lead.ultimaInteracao.toDate().toLocaleString() : 'N/A'}"`
     ].join(','));
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
@@ -274,10 +281,10 @@ export default function LeadsPage() {
                           </TableHeader>
                           <TableBody>
                               {isLoading ? (
-                                  <TableRow><TableCell colSpan={6} className="text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></TableCell></TableRow>
+                                  <TableRow><TableCell colSpan={6} className="text-center py-10"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></TableCell></TableRow>
                               ) : error ? (
-                                   <TableRow><TableCell colSpan={6} className="text-center text-red-400"><AlertCircle className="inline mr-2"/> {error.message}</TableCell></TableRow>
-                              ) : filteredLeads.length > 0 ? (
+                                   <TableRow><TableCell colSpan={6} className="text-center text-red-400 py-10"><AlertCircle className="inline mr-2"/> Houve um erro ao carregar os leads.</TableCell></TableRow>
+                              ) : filteredLeads && filteredLeads.length > 0 ? (
                                   filteredLeads.map(lead => (
                                       <TableRow key={lead.id} className="border-zinc-800 hover:bg-zinc-900/40">
                                           <TableCell className="font-medium text-white">{lead.nome}</TableCell>
@@ -289,11 +296,11 @@ export default function LeadsPage() {
                                               </div>
                                           </TableCell>
                                           <TableCell className="text-zinc-400 hidden md:table-cell"><ClientTime date={lead.ultimaInteracao} /></TableCell>
-                                          <TableCell className="text-zinc-300 font-mono hidden lg:table-cell">{lead.valorContrato.toFixed(2)}</TableCell>
+                                          <TableCell className="text-zinc-300 font-mono hidden lg:table-cell">{lead.valorContrato?.toFixed(2) ?? '0.00'}</TableCell>
                                           <TableCell className="text-right">
                                               <Dialog open={openDialogs[lead.id]} onOpenChange={(open) => setOpenDialogs(prev => ({...prev, [lead.id]: open}))}>
                                                   <DialogTrigger asChild>
-                                                       <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
+                                                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4 text-zinc-400 hover:text-white" /></Button>
                                                   </DialogTrigger>
                                                   <EditLeadDialog lead={lead} onSave={() => setOpenDialogs(prev => ({...prev, [lead.id]: false}))} />
                                               </Dialog>

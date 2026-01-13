@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -86,6 +86,20 @@ const statusConfig = {
     'Em Negociação': { color: 'bg-orange-500/20 text-orange-300 border-orange-500/30', label: 'Em Negociação' },
     'Fechado': { color: 'bg-green-500/20 text-green-300 border-green-500/30', label: 'Fechado' },
     'Perdido': { color: 'bg-red-500/20 text-red-300 border-red-500/30', label: 'Perdido' },
+};
+
+const ClientTime = ({ date }: { date: Date | null | undefined }) => {
+    const [timeAgo, setTimeAgo] = useState('');
+
+    useEffect(() => {
+        if (date) {
+            setTimeAgo(formatDistanceToNow(date, { addSuffix: true, locale: ptBR }));
+        } else {
+            setTimeAgo('N/A');
+        }
+    }, [date]);
+
+    return <>{timeAgo}</>;
 };
 
 const getInitials = (name: string) => {
@@ -519,8 +533,8 @@ function LeadsContent() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-zinc-400">
-                                        {lead.ultimaInteracao ? formatDistanceToNow(lead.ultimaInteracao.toDate(), { addSuffix: true, locale: ptBR }) : 'N/A'}
-                                    </TableCell>
+                                       <ClientTime date={lead.ultimaInteracao?.toDate()} />
+                                     </TableCell>
                                      <TableCell className="text-zinc-400 truncate max-w-[150px]">
                                         {lead.notes || '-'}
                                      </TableCell>
@@ -540,7 +554,7 @@ function LeadsContent() {
                                                     </AlertDialogTrigger>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                            <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white z-[102]">
+                                            <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white z-[103]">
                                                 <AlertDialogHeader>
                                                     <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
                                                     <AlertDialogDescription className="text-zinc-400">

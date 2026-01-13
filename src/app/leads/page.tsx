@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, doc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
-import { formatDistanceToNow, parseISO } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,13 +27,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog';
 import {
-    MoreHorizontal,
     PlusCircle,
     Search,
     Loader2,
@@ -41,7 +39,7 @@ import {
     Trash2,
     Edit,
     FileDown,
-    X
+    CircleDollarSign
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -173,6 +171,14 @@ export default function LeadsPage() {
     });
   }, [leads, searchTerm, statusFilter]);
 
+    const totalRevenue = useMemo(() => {
+    if (!leads) return 0;
+    return leads
+      .filter(lead => lead.status === 'Fechado')
+      .reduce((sum, lead) => sum + (lead.valorContrato || 0), 0);
+  }, [leads]);
+
+
   const handleDelete = async (leadId: string) => {
     if (!user) return;
     const leadRef = doc(firestore, `users/${user.uid}/leads/${leadId}`);
@@ -240,6 +246,17 @@ export default function LeadsPage() {
                     </div>
                 </div>
 
+                <div className="mb-8 bg-zinc-900/40 border border-green-500/30 backdrop-blur-sm rounded-lg p-6 flex items-center justify-between">
+                    <div>
+                        <h3 className="text-sm font-medium text-green-300">Total Fechado</h3>
+                        <p className="text-3xl font-bold text-white mt-1">
+                            {isLoading ? <Loader2 className="w-6 h-6 animate-spin"/> : `R$ ${totalRevenue.toFixed(2).replace('.', ',')}`}
+                        </p>
+                    </div>
+                    <CircleDollarSign className="w-10 h-10 text-green-500/50" />
+                </div>
+
+
                 <motion.div 
                     className="p-6 space-y-6 bg-zinc-900/40 border border-zinc-800/80 backdrop-blur-sm rounded-lg"
                     initial={{ opacity: 0 }}
@@ -298,7 +315,7 @@ export default function LeadsPage() {
                                           <TableCell className="text-zinc-400 hidden md:table-cell"><ClientTime date={lead.ultimaInteracao} /></TableCell>
                                           <TableCell className="text-zinc-300 font-mono hidden lg:table-cell">{lead.valorContrato?.toFixed(2) ?? '0.00'}</TableCell>
                                           <TableCell className="text-right">
-                                              <Dialog open={openDialogs[lead.id]} onOpenChange={(open) => setOpenDialogs(prev => ({...prev, [lead.id]: open}))}>
+                                              <Dialog open={openDialogs[lead.id] || false} onOpenChange={(open) => setOpenDialogs(prev => ({...prev, [lead.id]: open}))}>
                                                   <DialogTrigger asChild>
                                                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4 text-zinc-400 hover:text-white" /></Button>
                                                   </DialogTrigger>

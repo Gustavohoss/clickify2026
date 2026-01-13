@@ -74,13 +74,13 @@
           "enum": ["Novo", "Contatado", "Em Negociação", "Fechado", "Perdido"]
         },
         "valorContrato": {
-            "type": "number",
-            "description": "The contract value if the lead is closed."
+          "type": "number",
+          "description": "The contract value if the lead is closed."
         },
         "ultimaInteracao": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Timestamp of the last interaction with the lead."
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last interaction with the lead."
         },
         "createdAt": {
           "type": "string",

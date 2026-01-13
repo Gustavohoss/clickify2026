@@ -287,29 +287,6 @@ function PainelContent() {
                   <Search className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-primary/10 transition-colors duration-500"/>
                 </div>
               </Link>
-              <Link href="/leads" passHref>
-                 <div
-                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-orange-500/40 hover:shadow-2xl hover:shadow-orange-500/20 cursor-pointer"
-                >
-                  <Spotlight
-                      className="-top-20 -left-20 md:left-0 md:-top-10"
-                      fill={'#f97316'}
-                  />
-                  <div className="relative z-10">
-                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-                      Gestão de Leads
-                    </h2>
-                    <p className="text-white/40 mt-2">
-                      Gerencie e anote os contatos que você salvou.
-                    </p>
-                  </div>
-                  <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
-                    Acessar Ferramenta
-                    <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                  <FileText className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-orange-500/10 transition-colors duration-500"/>
-                </div>
-              </Link>
                <Link href="/contrato" passHref>
                 <div
                   className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer"

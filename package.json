@@ -58,7 +58,7 @@
     "cheerio": "^1.0.0-rc.12",
     "jspdf": "^2.5.1",
     "three": "^0.167.0",
-    "@react-three/fiber": "^9.0.0",
+    "@react-three/fiber": "9.0.0",
     "@react-three/drei": "9.109.2"
   },
   "devDependencies": {

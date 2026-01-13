@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
@@ -98,6 +99,10 @@ const ClientTime = ({ date }: { date: Date | null | undefined }) => {
             setTimeAgo('N/A');
         }
     }, [date]);
+
+    if (!timeAgo) {
+      return null;
+    }
 
     return <>{timeAgo}</>;
 };
@@ -441,7 +446,7 @@ function LeadsContent() {
                                     <TableCell colSpan={8} className="text-center h-24 text-red-400">
                                         <div className="flex justify-center items-center gap-2">
                                             <AlertCircle className="w-5 h-5"/>
-                                            <span>Erro ao carregar os leads: {error.message}</span>
+                                            <span>Erro ao carregar os leads.</span>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -554,7 +559,7 @@ function LeadsContent() {
                                                     </AlertDialogTrigger>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                            <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white z-[103]">
+                                            <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
                                                 <AlertDialogHeader>
                                                     <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
                                                     <AlertDialogDescription className="text-zinc-400">

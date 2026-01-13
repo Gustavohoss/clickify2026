@@ -307,7 +307,7 @@ function LeadsContent() {
                             </DropdownMenu>
 
                             <Sheet open={isNewLeadSheetOpen} onOpenChange={setIsNewLeadSheetOpen}>
-                                <SheetContent className="bg-black border-zinc-800 text-white w-full sm:max-w-md overflow-y-auto z-[101]">
+                                <SheetContent className="bg-black border-zinc-800 text-white w-full sm:max-w-md overflow-y-auto z-[102]">
                                     <SheetHeader>
                                         <SheetTitle>Criar Novo Lead</SheetTitle>
                                         <SheetDescription>Preencha as informações abaixo para adicionar um novo lead.</SheetDescription>
@@ -460,7 +460,7 @@ function LeadsContent() {
                                                     <span className="text-white font-bold group-hover:text-purple-400 transition-colors">{lead.nome}</span>
                                                  </div>
                                             </SheetTrigger>
-                                            <SheetContent className="bg-black border-zinc-800 text-white w-full sm:max-w-md overflow-y-auto z-[101]">
+                                            <SheetContent className="bg-black border-zinc-800 text-white w-full sm:max-w-md overflow-y-auto z-[102]">
                                                 <SheetHeader>
                                                     <SheetTitle className="text-2xl text-white">{lead.nome}</SheetTitle>
                                                 </SheetHeader>
@@ -571,5 +571,3 @@ export default function LeadsPage() {
         </AuthGuard>
     )
 }
-
-    

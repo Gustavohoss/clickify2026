@@ -329,7 +329,7 @@ function LeadsContent() {
                                     <TableCell className="font-medium">
                                         <Sheet open={editingLeadId === lead.id} onOpenChange={(isOpen) => !isOpen && setEditingLeadId(null)}>
                                             <SheetTrigger asChild>
-                                                 <div className="flex items-center gap-3 cursor-pointer group">
+                                                 <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setEditingLeadId(lead.id)}>
                                                     <Avatar className="h-8 w-8">
                                                         <AvatarFallback className="bg-purple-800/60 text-white text-xs font-bold">
                                                             {getInitials(lead.nome)}
@@ -409,10 +409,10 @@ function LeadsContent() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="bg-zinc-900 text-white border-zinc-800">
-                                                    <DropdownMenuItem onSelect={() => setEditingLeadId(lead.id)} className="focus:bg-zinc-800"><Edit className="mr-2 h-4 w-4"/> Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem onSelect={() => handleArchiveLead(lead.id)} className="focus:bg-zinc-800"><Archive className="mr-2 h-4 w-4"/> Arquivar</DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={() => setEditingLeadId(lead.id)} className="cursor-pointer focus:bg-zinc-800"><Edit className="mr-2 h-4 w-4"/> Editar</DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={() => handleArchiveLead(lead.id)} className="cursor-pointer focus:bg-zinc-800"><Archive className="mr-2 h-4 w-4"/> Arquivar</DropdownMenuItem>
                                                     <AlertDialogTrigger asChild>
-                                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-400 focus:bg-red-900/50 focus:text-red-300"><Trash2 className="mr-2 h-4 w-4"/> Excluir</DropdownMenuItem>
+                                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-400 focus:bg-red-900/50 focus:text-red-300 cursor-pointer"><Trash2 className="mr-2 h-4 w-4"/> Excluir</DropdownMenuItem>
                                                     </AlertDialogTrigger>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -447,3 +447,5 @@ export default function LeadsPage() {
         </AuthGuard>
     )
 }
+
+    

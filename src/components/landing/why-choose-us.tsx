@@ -3,7 +3,6 @@
 
 import { BarChart, Bot, Brush, Sparkles, Zap, Settings } from 'lucide-react';
 import React, { Suspense } from 'react';
-import { SplineScene } from '@/components/ui/spline';
 import { Spotlight } from '@/components/ui/spotlight';
 import { Button } from '@/components/ui/button';
 
@@ -13,10 +12,7 @@ const features = [
     description: 'Nossa inteligência artificial gera projetos completos baseados nas suas respostas.',
     content: (
         <div className="w-full h-full bg-black relative flex items-center justify-center">
-            <SplineScene 
-                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                className="w-full h-full"
-            />
+            
         </div>
     ),
     spotlightFill: '#a855f7',

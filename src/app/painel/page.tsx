@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2, Users, Copy, Check, Loader2 } from 'lucide-react';
@@ -29,10 +30,8 @@ import { Spotlight } from '@/components/ui/spotlight';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { collection, doc, Timestamp, DocumentReference, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, doc, Timestamp, type DocumentReference } from 'firebase/firestore';
 import { startOfDay, format } from 'date-fns';
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 
 import {
   Card,
@@ -114,119 +113,12 @@ function InviteDialog() {
     );
 }
 
-function DemoModeDialog({ userProfile, userProfileRef }: { userProfile: UserProfile | null, userProfileRef: DocumentReference | null }) {
-    const { toast } = useToast();
-    const [isDemo, setIsDemo] = useState(userProfile?.isDemoAccount || false);
-    const [balance, setBalance] = useState(userProfile?.demoBalance || 50000);
-    const [isSaving, setIsSaving] = useState(false);
-
-    useEffect(() => {
-        setIsDemo(userProfile?.isDemoAccount || false);
-        setBalance(userProfile?.demoBalance || 50000);
-    }, [userProfile]);
-
-    const handleSave = async () => {
-        if (!userProfileRef) return;
-        setIsSaving(true);
-        try {
-            const docSnap = await getDoc(userProfileRef);
-            const currentData = docSnap.data();
-
-            const dataToUpdate: any = {
-                isDemoAccount: isDemo,
-                demoBalance: Number(balance),
-            };
-
-            if (!currentData || currentData.plan === undefined) {
-                dataToUpdate.plan = 'Vitalicio';
-            }
-
-            await setDoc(userProfileRef, dataToUpdate, { merge: true });
-
-            toast({
-                title: "Sucesso!",
-                description: "Perfil atualizado. Contas antigas agora têm os campos necessários.",
-            });
-        } catch (error) {
-            console.error("Failed to update demo mode:", error);
-            toast({
-                title: "Erro",
-                description: "Não foi possível atualizar o modo demonstração.",
-                variant: "destructive",
-            });
-        } finally {
-            setIsSaving(false);
-        }
-    };
-    
-    return (
-        <DialogContent className="bg-transparent p-0 border-0 sm:max-w-[480px]">
-            <div className="group relative p-6 rounded-2xl overflow-hidden bg-background/80 backdrop-blur-xl border border-primary/20 shadow-2xl shadow-primary/20">
-                <Spotlight
-                    className="-top-20 -left-20 md:left-0 md:-top-10"
-                    fill={'#a855f7'}
-                />
-                <div className="relative z-10">
-                    <DialogHeader>
-                        <DialogTitle className="text-white text-xl font-bold">Modo Demonstração</DialogTitle>
-                        <DialogDescription className="text-zinc-400 pt-1">
-                            Ative para simular ganhos no gráfico do painel com um saldo fake.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-6 my-6">
-                        <div className="flex items-center justify-between space-x-2 rounded-lg border border-zinc-700/80 p-4">
-                           <div className="space-y-0.5">
-                                <Label htmlFor="demo-mode-switch" className="text-base text-white">Ativar Saldo Fake</Label>
-                                <p className="text-xs text-zinc-400">
-                                    Substitui os ganhos reais por dados simulados.
-                                </p>
-                           </div>
-                           <Switch
-                             id="demo-mode-switch"
-                             checked={isDemo}
-                             onCheckedChange={setIsDemo}
-                           />
-                        </div>
-                        <AnimatePresence>
-                        {isDemo && (
-                            <motion.div 
-                                className="space-y-2"
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                            >
-                                <Label htmlFor="demo-balance" className="text-white/80">Saldo Fake para o Mês (R$)</Label>
-                                <Input
-                                    id="demo-balance"
-                                    type="number"
-                                    value={balance}
-                                    onChange={(e) => setBalance(Number(e.target.value))}
-                                    placeholder="Ex: 50000"
-                                    className="bg-zinc-900/50 border-zinc-700/80"
-                                />
-                            </motion.div>
-                        )}
-                        </AnimatePresence>
-                    </div>
-                    <DialogFooter>
-                        <Button onClick={handleSave} disabled={isSaving} className="w-full bg-primary hover:bg-primary/90">
-                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                            <span className="ml-2">{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
-                        </Button>
-                    </DialogFooter>
-                </div>
-            </div>
-        </DialogContent>
-    );
-}
-
 function Header({ userProfile, userProfileRef }: { userProfile: UserProfile | null, userProfileRef: DocumentReference | null }) {
   const { auth } = useFirebase();
   const { user } = useUser();
   const router = useRouter();
 
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
-  const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     await auth.signOut();
@@ -272,10 +164,6 @@ function Header({ userProfile, userProfileRef }: { userProfile: UserProfile | nu
                   <Users className="mr-2 h-4 w-4" />
                   <span>Convite para Equipe</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setIsDemoDialogOpen(true);}} className="cursor-pointer focus:bg-zinc-800 focus:text-white">
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  <span>Modo Demonstração</span>
-                </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem
                 onClick={handleSignOut}
@@ -290,9 +178,6 @@ function Header({ userProfile, userProfileRef }: { userProfile: UserProfile | nu
       </header>
       <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
         <InviteDialog />
-      </Dialog>
-      <Dialog open={isDemoDialogOpen} onOpenChange={setIsDemoDialogOpen}>
-        <DemoModeDialog userProfile={userProfile} userProfileRef={userProfileRef} />
       </Dialog>
     </>
   );

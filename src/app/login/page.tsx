@@ -88,6 +88,8 @@ export default function LoginPage() {
             displayName: displayName,
             createdAt: serverTimestamp(),
             plan: 'Pendente',
+            isDemoAccount: false,
+            demoBalance: 0,
         });
         // After sign up, show verification popup
         setShowVerificationPopup(true);
@@ -121,6 +123,8 @@ export default function LoginPage() {
             displayName: user.displayName,
             createdAt: serverTimestamp(),
             plan: 'Pendente',
+            isDemoAccount: false,
+            demoBalance: 0,
         });
       }
       // For both new and existing users, check their plan
@@ -366,5 +370,3 @@ function Alert({
       />
     );
   }
-
-    

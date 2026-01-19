@@ -29,7 +29,7 @@ import { Spotlight } from '@/components/ui/spotlight';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { collection, doc, Timestamp, DocumentReference, updateDoc } from 'firebase/firestore';
+import { collection, doc, Timestamp, DocumentReference, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { startOfDay, format } from 'date-fns';
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -58,7 +58,7 @@ type Lead = {
 };
 
 type UserProfile = {
-  plan: string;
+  plan?: string;
   isDemoAccount?: boolean;
   demoBalance?: number;
 };
@@ -129,13 +129,23 @@ function DemoModeDialog({ userProfile, userProfileRef }: { userProfile: UserProf
         if (!userProfileRef) return;
         setIsSaving(true);
         try {
-            await updateDoc(userProfileRef, {
+            const docSnap = await getDoc(userProfileRef);
+            const currentData = docSnap.data();
+
+            const dataToUpdate: any = {
                 isDemoAccount: isDemo,
-                demoBalance: Number(balance)
-            });
+                demoBalance: Number(balance),
+            };
+
+            if (!currentData || currentData.plan === undefined) {
+                dataToUpdate.plan = 'Vitalicio';
+            }
+
+            await setDoc(userProfileRef, dataToUpdate, { merge: true });
+
             toast({
                 title: "Sucesso!",
-                description: "Modo demonstração atualizado.",
+                description: "Perfil atualizado. Contas antigas agora têm os campos necessários.",
             });
         } catch (error) {
             console.error("Failed to update demo mode:", error);

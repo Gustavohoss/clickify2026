@@ -45,7 +45,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { Area, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 
 // New Lead type for this page
@@ -148,37 +148,34 @@ function PainelContent() {
   }, [leads]);
 
   useEffect(() => {
-    // This effect will run only on the client, avoiding hydration mismatches.
+    if (isProfileLoading) {
+      return; 
+    }
+
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEnd = endOfMonth(monthStart);
+    const monthEnd = endOfMonth(now);
     const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
     const formattedMonthDays = monthDays.map(d => format(d, 'dd/MM'));
 
-    // Wait until the user profile is loaded to decide which data to show.
-    if (isProfileLoading) {
-      return;
-    }
-
-    const isDemo = userProfile?.isDemoAccount;
-    const demoBalanceValue = Number(userProfile?.demoBalance) || 0;
-
     let data;
-    if (isDemo) {
-        const totalBalance = demoBalanceValue || 50000;
-        const daysInMonth = formattedMonthDays.length;
-        
-        // Generate random values and normalize them to sum up to totalBalance
-        const randomValues = Array.from({ length: daysInMonth }, () => Math.random());
-        const sumOfRandoms = randomValues.reduce((a, b) => a + b, 0);
-        
-        const normalizationFactor = sumOfRandoms > 0 ? totalBalance / sumOfRandoms : 0;
-        const normalizedValues = randomValues.map(v => v * normalizationFactor);
-        
-        data = formattedMonthDays.map((day, index) => ({
-            day: day,
-            total: normalizedValues[index] || 0,
-        }));
+
+    if (userProfile?.isDemoAccount) {
+      const demoBalanceValue = Number(userProfile?.demoBalance) || 0;
+      const totalBalance = demoBalanceValue > 0 ? demoBalanceValue : 50000; // Default if 0
+      const daysInMonth = formattedMonthDays.length;
+      
+      const randomValues = Array.from({ length: daysInMonth }, () => Math.random());
+      const sumOfRandoms = randomValues.reduce((a, b) => a + b, 0);
+      
+      const normalizationFactor = sumOfRandoms > 0 ? totalBalance / sumOfRandoms : 0;
+      const normalizedValues = randomValues.map(v => v * normalizationFactor);
+      
+      data = formattedMonthDays.map((day, index) => ({
+          day: day,
+          total: normalizedValues[index] || 0,
+      }));
+
     } else {
         if (!leads) {
              data = formattedMonthDays.map(day => ({ day, total: 0 }));
@@ -204,7 +201,7 @@ function PainelContent() {
         }
     }
     setChartData(data);
-  }, [leads, userProfile, isProfileLoading]); // Rerun when data sources change
+  }, [leads, userProfile, isProfileLoading]);
 
 const chartConfig = {
     total: {
@@ -316,20 +313,6 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                                     bottom: 0,
                                 }}
                             >
-                                <defs>
-                                    <linearGradient id="fillTotal" x1="0" y1="0" x2="0" y2="1">
-                                        <stop
-                                            offset="5%"
-                                            stopColor="var(--color-total)"
-                                            stopOpacity={0.8}
-                                        />
-                                        <stop
-                                            offset="95%"
-                                            stopColor="var(--color-total)"
-                                            stopOpacity={0.1}
-                                        />
-                                    </linearGradient>
-                                </defs>
                                 <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
                                 <XAxis
                                     dataKey="day"
@@ -343,8 +326,10 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={10}
+                                    domain={[0, 'dataMax + 1000']}
                                     tickFormatter={(value) => {
                                         const numValue = Number(value);
+                                        if (isNaN(numValue)) return '';
                                         if (numValue >= 1000) {
                                             return `R$${(numValue / 1000).toFixed(0)}k`;
                                         }
@@ -364,13 +349,12 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                                         labelClassName="text-white font-bold"
                                     />}
                                 />
-                                <Area
+                                <Line
                                     dataKey="total"
                                     type="monotone"
-                                    fill="url(#fillTotal)"
-                                    fillOpacity={1}
                                     stroke="var(--color-total)"
                                     strokeWidth={2}
+                                    dot={false}
                                 />
                             </LineChart>
                           </ChartContainer>

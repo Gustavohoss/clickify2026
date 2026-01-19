@@ -1,4 +1,3 @@
-
 'use client';
 
 import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2, Users, Copy, Check, Loader2 } from 'lucide-react';
@@ -31,11 +30,30 @@ import React, { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { collection, doc, Timestamp } from 'firebase/firestore';
-import { startOfDay } from 'date-fns';
+import { startOfDay, format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart"
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+
+
+// New Lead type for this page
 type Lead = {
   id: string;
   createdAt: Timestamp;
+  status: string;
+  valorContrato: number;
 };
 
 type UserProfile = {
@@ -189,6 +207,41 @@ function PainelContent() {
     return leads.filter(lead => lead.createdAt.toDate() >= todayStart).length;
   }, [leads]);
 
+  const chartData = useMemo(() => {
+    if (!leads) return [];
+
+    const closedLeads = leads.filter(lead => lead.status === 'Fechado');
+    
+    const monthlyGains = closedLeads.reduce((acc, lead) => {
+        const month = format(lead.createdAt.toDate(), 'MMM', { locale: ptBR });
+        const monthKey = format(lead.createdAt.toDate(), 'yyyy-MM');
+        
+        if (!acc[monthKey]) {
+            acc[monthKey] = { month: month.charAt(0).toUpperCase() + month.slice(1), total: 0 };
+        }
+        acc[monthKey].total += lead.valorContrato || 0;
+        
+        return acc;
+    }, {} as Record<string, { month: string; total: number }>);
+    
+    // Sort by month
+    const sortedData = Object.values(monthlyGains).sort((a, b) => {
+        const monthA = Object.keys(monthlyGains).find(key => monthlyGains[key] === a)!;
+        const monthB = Object.keys(monthlyGains).find(key => monthlyGains[key] === b)!;
+        return new Date(monthA).getTime() - new Date(monthB).getTime();
+    });
+
+    return sortedData;
+}, [leads]);
+
+const chartConfig = {
+    total: {
+      label: "Ganhos",
+      color: "hsl(var(--primary))",
+    },
+} as const;
+
+
   return (
     <>
       <Header />
@@ -260,6 +313,56 @@ function PainelContent() {
                   )}
                 </div>
               </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+               <Card className="bg-background/50 border-primary/20">
+                  <CardHeader>
+                      <CardTitle className="text-white">Ganhos Mensais</CardTitle>
+                      <CardDescription className="text-white/50">Soma dos contratos fechados por mês.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                      {areLeadsLoading ? (
+                          <div className="flex items-center justify-center h-[250px]">
+                              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                          </div>
+                      ) : (
+                          <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                              <BarChart accessibilityLayer data={chartData}>
+                                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
+                                  <XAxis
+                                      dataKey="month"
+                                      tickLine={false}
+                                      tickMargin={10}
+                                      axisLine={false}
+                                      stroke="hsl(var(--foreground) / 0.5)"
+                                  />
+                                  <YAxis
+                                      stroke="hsl(var(--foreground) / 0.5)"
+                                      tickLine={false}
+                                      axisLine={false}
+                                      tickMargin={10}
+                                      tickFormatter={(value) => `R$${Number(value) / 1000}k`}
+                                  />
+                                  <ChartTooltip
+                                      cursor={false}
+                                      content={<ChartTooltipContent
+                                          formatter={(value) => `R$${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                                          indicator="dot" 
+                                      />}
+                                      wrapperClassName="bg-background/80 backdrop-blur-lg border border-primary/20 rounded-lg shadow-lg"
+                                      labelClassName="text-white font-bold"
+                                  />
+                                  <Bar dataKey="total" fill="var(--color-total)" radius={4} />
+                              </BarChart>
+                          </ChartContainer>
+                      )}
+                  </CardContent>
+              </Card>
             </motion.div>
 
 
@@ -396,4 +499,3 @@ export default function PainelPage() {
         </AuthGuard>
     );
 }
-

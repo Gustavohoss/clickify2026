@@ -31,7 +31,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { collection, doc, Timestamp, type DocumentReference, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { startOfDay, format } from 'date-fns';
+import { startOfDay, format, getDaysInMonth, eachDayOfInterval, endOfMonth } from 'date-fns';
 
 import {
   Card,
@@ -62,8 +62,8 @@ type UserProfile = {
   demoBalance?: number;
 };
 
-function Header({ userProfile, userProfileRef }: { userProfile: UserProfile | null, userProfileRef: DocumentReference | null }) {
-  const { auth, firestore } = useFirebase();
+function Header({ userProfile }: { userProfile: UserProfile | null }) {
+  const { auth } = useFirebase();
   const { user } = useUser();
   const router = useRouter();
 
@@ -139,6 +139,7 @@ function PainelContent() {
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
   const { data: leads, isLoading: areLeadsLoading } = useCollection<Lead>(leadsQuery);
+  const [chartData, setChartData] = useState<{ day: string; total: number }[]>([]);
 
   const leadsToday = useMemo(() => {
     if (!leads) return 0;
@@ -146,58 +147,64 @@ function PainelContent() {
     return leads.filter(lead => lead.createdAt.toDate() >= todayStart).length;
   }, [leads]);
 
-    const chartData = useMemo(() => {
+  useEffect(() => {
+    // This effect will run only on the client, avoiding hydration mismatches.
     const now = new Date();
-    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    const monthDays = Array.from({ length: daysInMonth }, (_, i) => 
-        format(new Date(now.getFullYear(), now.getMonth(), i + 1), 'dd/MM')
-    );
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = endOfMonth(monthStart);
+    const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+    const formattedMonthDays = monthDays.map(d => format(d, 'dd/MM'));
 
-    // This is the primary fix: ensure demoBalance is a number.
+    // Wait until the user profile is loaded to decide which data to show.
+    if (isProfileLoading) {
+      return;
+    }
+
     const isDemo = userProfile?.isDemoAccount;
     const demoBalanceValue = Number(userProfile?.demoBalance) || 0;
 
+    let data;
     if (isDemo) {
-        const totalBalance = demoBalanceValue || 50000; // Default to 50k if demoBalance is 0
-
+        const totalBalance = demoBalanceValue || 50000;
+        const daysInMonth = formattedMonthDays.length;
+        
         // Generate random values and normalize them to sum up to totalBalance
         const randomValues = Array.from({ length: daysInMonth }, () => Math.random());
         const sumOfRandoms = randomValues.reduce((a, b) => a + b, 0);
         
-        // Handle case where sum is 0 to avoid division by zero
         const normalizationFactor = sumOfRandoms > 0 ? totalBalance / sumOfRandoms : 0;
         const normalizedValues = randomValues.map(v => v * normalizationFactor);
         
-        return monthDays.map((day, index) => ({
+        data = formattedMonthDays.map((day, index) => ({
             day: day,
-            total: normalizedValues[index],
+            total: normalizedValues[index] || 0,
         }));
-    }
+    } else {
+        if (!leads) {
+             data = formattedMonthDays.map(day => ({ day, total: 0 }));
+        } else {
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
 
-    if (!leads) {
-        return monthDays.map(day => ({ day, total: 0 }));
-    }
+            const dailyGains = leads.reduce((acc, lead) => {
+                if (lead.status !== 'Fechado') return acc;
+                
+                const leadDate = lead.createdAt.toDate();
+                if (leadDate.getMonth() === currentMonth && leadDate.getFullYear() === currentYear) {
+                    const day = format(leadDate, 'dd/MM');
+                    acc[day] = (acc[day] || 0) + (lead.valorContrato || 0);
+                }
+                return acc;
+            }, {} as Record<string, number>);
 
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    const dailyGains = leads.reduce((acc, lead) => {
-        if (lead.status !== 'Fechado') return acc;
-        
-        const leadDate = lead.createdAt.toDate();
-        if (leadDate.getMonth() === currentMonth && leadDate.getFullYear() === currentYear) {
-            const day = format(leadDate, 'dd/MM');
-            acc[day] = (acc[day] || 0) + (lead.valorContrato || 0);
+            data = formattedMonthDays.map(day => ({
+                day,
+                total: dailyGains[day] || 0,
+            }));
         }
-        return acc;
-    }, {} as Record<string, number>);
-
-    return monthDays.map(day => ({
-        day,
-        total: dailyGains[day] || 0,
-    }));
-
-}, [leads, userProfile]);
+    }
+    setChartData(data);
+  }, [leads, userProfile, isProfileLoading]); // Rerun when data sources change
 
 const chartConfig = {
     total: {
@@ -206,10 +213,12 @@ const chartConfig = {
     },
 } as const;
 
+const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLeadsLoading);
+
 
   return (
     <>
-      <Header userProfile={userProfile} userProfileRef={userProfileRef} />
+      <Header userProfile={userProfile} />
       <main className="p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-black text-white relative overflow-hidden">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <div className="absolute -top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
@@ -291,7 +300,7 @@ const chartConfig = {
                       <CardDescription className="text-white/50">Soma dos contratos fechados neste mês.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                      {areLeadsLoading ? (
+                      {isLoadingChart ? (
                           <div className="flex items-center justify-center h-[250px]">
                               <Loader2 className="w-8 h-8 animate-spin text-primary" />
                           </div>

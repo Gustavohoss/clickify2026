@@ -30,7 +30,7 @@ import React, { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { collection, doc, Timestamp } from 'firebase/firestore';
-import { startOfDay, format } from 'date-fns';
+import { startOfDay, format, getMonth, getYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 import {
@@ -207,28 +207,34 @@ function PainelContent() {
     return leads.filter(lead => lead.createdAt.toDate() >= todayStart).length;
   }, [leads]);
 
-  const chartData = useMemo(() => {
+    const chartData = useMemo(() => {
     if (!leads) return [];
 
-    const closedLeads = leads.filter(lead => lead.status === 'Fechado');
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const closedLeadsThisMonth = leads.filter(lead => {
+        if (lead.status !== 'Fechado') return false;
+        const leadDate = lead.createdAt.toDate();
+        return leadDate.getMonth() === currentMonth && leadDate.getFullYear() === currentYear;
+    });
     
-    const monthlyGains = closedLeads.reduce((acc, lead) => {
-        const month = format(lead.createdAt.toDate(), 'MMM', { locale: ptBR });
-        const monthKey = format(lead.createdAt.toDate(), 'yyyy-MM');
+    const dailyGains = closedLeadsThisMonth.reduce((acc, lead) => {
+        const day = format(lead.createdAt.toDate(), 'dd/MM');
         
-        if (!acc[monthKey]) {
-            acc[monthKey] = { month: month.charAt(0).toUpperCase() + month.slice(1), total: 0 };
+        if (!acc[day]) {
+            acc[day] = { day: day, total: 0 };
         }
-        acc[monthKey].total += lead.valorContrato || 0;
+        acc[day].total += lead.valorContrato || 0;
         
         return acc;
-    }, {} as Record<string, { month: string; total: number }>);
+    }, {} as Record<string, { day: string; total: number }>);
     
-    // Sort by month
-    const sortedData = Object.values(monthlyGains).sort((a, b) => {
-        const monthA = Object.keys(monthlyGains).find(key => monthlyGains[key] === a)!;
-        const monthB = Object.keys(monthlyGains).find(key => monthlyGains[key] === b)!;
-        return new Date(monthA).getTime() - new Date(monthB).getTime();
+    const sortedData = Object.values(dailyGains).sort((a, b) => {
+        const dayA = parseInt(a.day.split('/')[0]);
+        const dayB = parseInt(b.day.split('/')[0]);
+        return dayA - dayB;
     });
 
     return sortedData;
@@ -322,8 +328,8 @@ const chartConfig = {
             >
                <Card className="bg-background/50 border-primary/20">
                   <CardHeader>
-                      <CardTitle className="text-white">Ganhos Mensais</CardTitle>
-                      <CardDescription className="text-white/50">Soma dos contratos fechados por mês.</CardDescription>
+                      <CardTitle className="text-white">Ganhos do Mês</CardTitle>
+                      <CardDescription className="text-white/50">Soma dos contratos fechados neste mês.</CardDescription>
                   </CardHeader>
                   <CardContent>
                       {areLeadsLoading ? (
@@ -335,7 +341,7 @@ const chartConfig = {
                               <BarChart accessibilityLayer data={chartData}>
                                   <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
                                   <XAxis
-                                      dataKey="month"
+                                      dataKey="day"
                                       tickLine={false}
                                       tickMargin={10}
                                       axisLine={false}
@@ -346,7 +352,13 @@ const chartConfig = {
                                       tickLine={false}
                                       axisLine={false}
                                       tickMargin={10}
-                                      tickFormatter={(value) => `R$${Number(value) / 1000}k`}
+                                      tickFormatter={(value) => {
+                                          const numValue = Number(value);
+                                          if (numValue >= 1000) {
+                                              return `R$${(numValue / 1000).toFixed(1).replace('.', ',')}k`;
+                                          }
+                                          return `R$${numValue}`;
+                                      }}
                                   />
                                   <ChartTooltip
                                       cursor={false}

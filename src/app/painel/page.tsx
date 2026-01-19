@@ -140,6 +140,7 @@ function PainelContent() {
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
   const { data: leads, isLoading: areLeadsLoading } = useCollection<Lead>(leadsQuery);
   const [chartData, setChartData] = useState<{ day: string; total: number }[]>([]);
+  const [totalGanhos, setTotalGanhos] = useState(0);
 
   const leadsToday = useMemo(() => {
     if (!leads) return 0;
@@ -158,7 +159,7 @@ function PainelContent() {
     const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
     const formattedMonthDays = monthDays.map(d => format(d, 'dd/MM'));
 
-    let data;
+    let data: { day: string; total: number }[];
 
     if (userProfile?.isDemoAccount) {
       const demoBalanceValue = Number(userProfile?.demoBalance) || 0;
@@ -200,6 +201,8 @@ function PainelContent() {
             }));
         }
     }
+    const total = data.reduce((acc, curr) => acc + curr.total, 0);
+    setTotalGanhos(total);
     setChartData(data);
   }, [leads, userProfile, isProfileLoading]);
 
@@ -292,9 +295,21 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
               transition={{ delay: 0.5 }}
             >
                <Card className="bg-background/50 border-primary/20">
-                  <CardHeader>
-                      <CardTitle className="text-white">Ganhos do Mês</CardTitle>
-                      <CardDescription className="text-white/50">Soma dos contratos fechados neste mês.</CardDescription>
+                  <CardHeader className="flex flex-row items-start justify-between">
+                      <div>
+                          <CardTitle className="text-white">Ganhos do Mês</CardTitle>
+                          <CardDescription className="text-white/50">Soma dos contratos fechados neste mês.</CardDescription>
+                      </div>
+                      <div className="text-right">
+                          <CardDescription className="text-white/50">Ganhos Totais</CardDescription>
+                          <p className="text-2xl font-bold text-white">
+                            {isLoadingChart ? (
+                              <Loader2 className="w-6 h-6 animate-spin ml-auto" />
+                            ) : (
+                              new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalGanhos)
+                            )}
+                          </p>
+                      </div>
                   </CardHeader>
                   <CardContent>
                       {isLoadingChart ? (

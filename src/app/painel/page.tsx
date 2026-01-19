@@ -358,7 +358,7 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                                         strokeDasharray: "3 3",
                                     }}
                                     content={<ChartTooltipContent
-                                        formatter={(value) => `R$${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                                        formatter={(value) => Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         indicator="dot" 
                                         wrapperClassName="bg-background/80 backdrop-blur-lg border border-primary/20 rounded-lg shadow-lg"
                                         labelClassName="text-white font-bold"

@@ -45,7 +45,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Area, Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 
 // New Lead type for this page
@@ -338,39 +338,73 @@ const chartConfig = {
                           </div>
                       ) : (
                           <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                              <BarChart accessibilityLayer data={chartData}>
-                                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
-                                  <XAxis
-                                      dataKey="day"
-                                      tickLine={false}
-                                      tickMargin={10}
-                                      axisLine={false}
-                                      stroke="hsl(var(--foreground) / 0.5)"
-                                  />
-                                  <YAxis
-                                      stroke="hsl(var(--foreground) / 0.5)"
-                                      tickLine={false}
-                                      axisLine={false}
-                                      tickMargin={10}
-                                      tickFormatter={(value) => {
-                                          const numValue = Number(value);
-                                          if (numValue >= 1000) {
-                                              return `R$${(numValue / 1000).toFixed(1).replace('.', ',')}k`;
-                                          }
-                                          return `R$${numValue}`;
-                                      }}
-                                  />
-                                  <ChartTooltip
-                                      cursor={false}
-                                      content={<ChartTooltipContent
-                                          formatter={(value) => `R$${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                                          indicator="dot" 
-                                      />}
-                                      wrapperClassName="bg-background/80 backdrop-blur-lg border border-primary/20 rounded-lg shadow-lg"
-                                      labelClassName="text-white font-bold"
-                                  />
-                                  <Bar dataKey="total" fill="var(--color-total)" radius={4} />
-                              </BarChart>
+                              <LineChart
+                                accessibilityLayer
+                                data={chartData}
+                                margin={{
+                                    top: 10,
+                                    right: 10,
+                                    left: -20,
+                                    bottom: 0,
+                                }}
+                            >
+                                <defs>
+                                    <linearGradient id="fillTotal" x1="0" y1="0" x2="0" y2="1">
+                                        <stop
+                                            offset="5%"
+                                            stopColor="var(--color-total)"
+                                            stopOpacity={0.8}
+                                        />
+                                        <stop
+                                            offset="95%"
+                                            stopColor="var(--color-total)"
+                                            stopOpacity={0.1}
+                                        />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
+                                <XAxis
+                                    dataKey="day"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickMargin={8}
+                                    stroke="hsl(var(--foreground) / 0.5)"
+                                />
+                                 <YAxis
+                                    stroke="hsl(var(--foreground) / 0.5)"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickMargin={10}
+                                    tickFormatter={(value) => {
+                                        const numValue = Number(value);
+                                        if (numValue >= 1000) {
+                                            return `R$${(numValue / 1000).toFixed(0)}k`;
+                                        }
+                                        return `R$${numValue}`;
+                                    }}
+                                />
+                                <ChartTooltip
+                                    cursor={{
+                                        stroke: "hsl(var(--primary))",
+                                        strokeWidth: 1,
+                                        strokeDasharray: "3 3",
+                                    }}
+                                    content={<ChartTooltipContent
+                                        formatter={(value) => `R$${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                                        indicator="dot" 
+                                        wrapperClassName="bg-background/80 backdrop-blur-lg border border-primary/20 rounded-lg shadow-lg"
+                                        labelClassName="text-white font-bold"
+                                    />}
+                                />
+                                <Area
+                                    dataKey="total"
+                                    type="monotone"
+                                    fill="url(#fillTotal)"
+                                    fillOpacity={1}
+                                    stroke="var(--color-total)"
+                                    strokeWidth={2}
+                                />
+                            </LineChart>
                           </ChartContainer>
                       )}
                   </CardContent>

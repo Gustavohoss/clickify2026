@@ -30,7 +30,7 @@ import { Spotlight } from '@/components/ui/spotlight';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { collection, doc, Timestamp, type DocumentReference } from 'firebase/firestore';
+import { collection, doc, Timestamp, type DocumentReference, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { startOfDay, format } from 'date-fns';
 
 import {
@@ -62,63 +62,10 @@ type UserProfile = {
   demoBalance?: number;
 };
 
-
-function InviteDialog() {
-    const [copied, setCopied] = useState(false);
-    const { toast } = useToast();
-    
-    const inviteLink = typeof window !== 'undefined' ? `${window.location.origin}/equipe` : '';
-
-    const handleCopy = () => {
-        navigator.clipboard.writeText(inviteLink);
-        setCopied(true);
-        toast({
-            title: "Link Copiado!",
-            description: "O link de convite foi copiado para sua área de transferência.",
-        });
-        setTimeout(() => setCopied(false), 2000);
-    };
-
-    return (
-        <DialogContent className="bg-transparent p-0 border-0 sm:max-w-[480px]">
-          <div className="group relative p-6 rounded-2xl overflow-hidden bg-background/80 backdrop-blur-xl border border-primary/20 shadow-2xl shadow-primary/20">
-              <Spotlight
-                  className="-top-20 -left-20 md:left-0 md:-top-10"
-                  fill={'#a855f7'}
-              />
-              <div className="relative z-10">
-                  <DialogHeader>
-                      <DialogTitle className="text-white text-xl font-bold">Convide sua Equipe</DialogTitle>
-                      <DialogDescription className="text-zinc-400 pt-1">
-                          Você tem 3 convites restantes. Compartilhe o link abaixo para que seus amigos aproveitem a oferta especial.
-                      </DialogDescription>
-                  </DialogHeader>
-                  <div className="flex items-center space-x-2 my-6">
-                      <Input
-                          id="invite-link"
-                          value={inviteLink}
-                          readOnly
-                          className="flex-1 bg-zinc-900/50 border-zinc-700/80 text-zinc-300 h-10"
-                      />
-                      <Button type="button" size="sm" className="px-3 h-10 bg-primary hover:bg-primary/90" onClick={handleCopy}>
-                          {copied ? <Check className="h-5 w-5 text-white" /> : <Copy className="h-5 w-5 text-white" />}
-                      </Button>
-                  </div>
-                  <DialogFooter>
-                      <p className="text-xs text-zinc-500 text-center w-full">O link dá acesso a um plano Vitalício com desconto exclusivo.</p>
-                  </DialogFooter>
-              </div>
-          </div>
-        </DialogContent>
-    );
-}
-
 function Header({ userProfile, userProfileRef }: { userProfile: UserProfile | null, userProfileRef: DocumentReference | null }) {
-  const { auth } = useFirebase();
+  const { auth, firestore } = useFirebase();
   const { user } = useUser();
   const router = useRouter();
-
-  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     await auth.signOut();
@@ -160,11 +107,6 @@ function Header({ userProfile, userProfileRef }: { userProfile: UserProfile | nu
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
-               <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setIsInviteDialogOpen(true);}} className="cursor-pointer focus:bg-zinc-800 focus:text-white">
-                  <Users className="mr-2 h-4 w-4" />
-                  <span>Convite para Equipe</span>
-                </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem
                 onClick={handleSignOut}
                 className="cursor-pointer focus:bg-zinc-800 focus:text-white"
@@ -176,9 +118,6 @@ function Header({ userProfile, userProfileRef }: { userProfile: UserProfile | nu
           </DropdownMenu>
         </div>
       </header>
-      <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
-        <InviteDialog />
-      </Dialog>
     </>
   );
 }
@@ -208,68 +147,56 @@ function PainelContent() {
   }, [leads]);
 
     const chartData = useMemo(() => {
-    if (userProfile?.isDemoAccount) {
-        const now = new Date();
-        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        const totalBalance = userProfile.demoBalance || 50000;
-        const dailyData = [];
-        let remainingBalance = totalBalance;
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const monthDays = Array.from({ length: daysInMonth }, (_, i) => 
+        format(new Date(now.getFullYear(), now.getMonth(), i + 1), 'dd/MM')
+    );
 
-        for (let i = 1; i <= daysInMonth; i++) {
-            let dailyTotal = 0;
-            if (i < daysInMonth) {
-                if (Math.random() < 0.3) { // 30% chance of zero earnings
-                     dailyTotal = 0;
-                } else {
-                    let fluctuation = (Math.random() - 0.4) * 0.8; // Fluctuate
-                    let baseShare = remainingBalance / (daysInMonth - i + 1);
-                    dailyTotal = baseShare * (1 + fluctuation);
-                    dailyTotal = Math.max(0, dailyTotal);
-                    dailyTotal = Math.min(dailyTotal, remainingBalance);
-                    remainingBalance -= dailyTotal;
-                }
-            } else {
-                dailyTotal = remainingBalance; // Assign rest on the last day
-            }
+    // This is the primary fix: ensure demoBalance is a number.
+    const isDemo = userProfile?.isDemoAccount;
+    const demoBalanceValue = Number(userProfile?.demoBalance) || 0;
 
-            dailyData.push({
-                day: format(new Date(now.getFullYear(), now.getMonth(), i), 'dd/MM'),
-                total: dailyTotal
-            });
-        }
-        return dailyData;
+    if (isDemo) {
+        const totalBalance = demoBalanceValue || 50000; // Default to 50k if demoBalance is 0
+
+        // Generate random values and normalize them to sum up to totalBalance
+        const randomValues = Array.from({ length: daysInMonth }, () => Math.random());
+        const sumOfRandoms = randomValues.reduce((a, b) => a + b, 0);
+        
+        // Handle case where sum is 0 to avoid division by zero
+        const normalizationFactor = sumOfRandoms > 0 ? totalBalance / sumOfRandoms : 0;
+        const normalizedValues = randomValues.map(v => v * normalizationFactor);
+        
+        return monthDays.map((day, index) => ({
+            day: day,
+            total: normalizedValues[index],
+        }));
     }
 
-    if (!leads) return [];
+    if (!leads) {
+        return monthDays.map(day => ({ day, total: 0 }));
+    }
 
-    const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    const closedLeadsThisMonth = leads.filter(lead => {
-        if (lead.status !== 'Fechado') return false;
+    const dailyGains = leads.reduce((acc, lead) => {
+        if (lead.status !== 'Fechado') return acc;
+        
         const leadDate = lead.createdAt.toDate();
-        return leadDate.getMonth() === currentMonth && leadDate.getFullYear() === currentYear;
-    });
-    
-    const dailyGains = closedLeadsThisMonth.reduce((acc, lead) => {
-        const day = format(lead.createdAt.toDate(), 'dd/MM');
-        
-        if (!acc[day]) {
-            acc[day] = { day: day, total: 0 };
+        if (leadDate.getMonth() === currentMonth && leadDate.getFullYear() === currentYear) {
+            const day = format(leadDate, 'dd/MM');
+            acc[day] = (acc[day] || 0) + (lead.valorContrato || 0);
         }
-        acc[day].total += lead.valorContrato || 0;
-        
         return acc;
-    }, {} as Record<string, { day: string; total: number }>);
-    
-    const sortedData = Object.values(dailyGains).sort((a, b) => {
-        const dayA = parseInt(a.day.split('/')[0]);
-        const dayB = parseInt(b.day.split('/')[0]);
-        return dayA - dayB;
-    });
+    }, {} as Record<string, number>);
 
-    return sortedData;
+    return monthDays.map(day => ({
+        day,
+        total: dailyGains[day] || 0,
+    }));
+
 }, [leads, userProfile]);
 
 const chartConfig = {

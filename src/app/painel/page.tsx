@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2, Users, Copy, Check, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import AuthGuard from '@/components/auth-guard';
 import { useFirebase, useUser, useCollection, useDoc, useMemoFirebase } from '@/firebase';
@@ -26,12 +26,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Spotlight } from '@/components/ui/spotlight';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { collection, doc, Timestamp } from 'firebase/firestore';
-import { startOfDay, format, getMonth, getYear } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { collection, doc, Timestamp, DocumentReference, updateDoc } from 'firebase/firestore';
+import { startOfDay, format } from 'date-fns';
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 import {
   Card,
@@ -45,7 +46,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { Area, Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Area, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 
 // New Lead type for this page
@@ -58,6 +59,8 @@ type Lead = {
 
 type UserProfile = {
   plan: string;
+  isDemoAccount?: boolean;
+  demoBalance?: number;
 };
 
 
@@ -111,11 +114,109 @@ function InviteDialog() {
     );
 }
 
+function DemoModeDialog({ userProfile, userProfileRef }: { userProfile: UserProfile | null, userProfileRef: DocumentReference | null }) {
+    const { toast } = useToast();
+    const [isDemo, setIsDemo] = useState(userProfile?.isDemoAccount || false);
+    const [balance, setBalance] = useState(userProfile?.demoBalance || 50000);
+    const [isSaving, setIsSaving] = useState(false);
 
-function Header() {
+    useEffect(() => {
+        setIsDemo(userProfile?.isDemoAccount || false);
+        setBalance(userProfile?.demoBalance || 50000);
+    }, [userProfile]);
+
+    const handleSave = async () => {
+        if (!userProfileRef) return;
+        setIsSaving(true);
+        try {
+            await updateDoc(userProfileRef, {
+                isDemoAccount: isDemo,
+                demoBalance: Number(balance)
+            });
+            toast({
+                title: "Sucesso!",
+                description: "Modo demonstração atualizado.",
+            });
+        } catch (error) {
+            console.error("Failed to update demo mode:", error);
+            toast({
+                title: "Erro",
+                description: "Não foi possível atualizar o modo demonstração.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+    
+    return (
+        <DialogContent className="bg-transparent p-0 border-0 sm:max-w-[480px]">
+            <div className="group relative p-6 rounded-2xl overflow-hidden bg-background/80 backdrop-blur-xl border border-primary/20 shadow-2xl shadow-primary/20">
+                <Spotlight
+                    className="-top-20 -left-20 md:left-0 md:-top-10"
+                    fill={'#a855f7'}
+                />
+                <div className="relative z-10">
+                    <DialogHeader>
+                        <DialogTitle className="text-white text-xl font-bold">Modo Demonstração</DialogTitle>
+                        <DialogDescription className="text-zinc-400 pt-1">
+                            Ative para simular ganhos no gráfico do painel com um saldo fake.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-6 my-6">
+                        <div className="flex items-center justify-between space-x-2 rounded-lg border border-zinc-700/80 p-4">
+                           <div className="space-y-0.5">
+                                <Label htmlFor="demo-mode-switch" className="text-base text-white">Ativar Saldo Fake</Label>
+                                <p className="text-xs text-zinc-400">
+                                    Substitui os ganhos reais por dados simulados.
+                                </p>
+                           </div>
+                           <Switch
+                             id="demo-mode-switch"
+                             checked={isDemo}
+                             onCheckedChange={setIsDemo}
+                           />
+                        </div>
+                        <AnimatePresence>
+                        {isDemo && (
+                            <motion.div 
+                                className="space-y-2"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                            >
+                                <Label htmlFor="demo-balance" className="text-white/80">Saldo Fake para o Mês (R$)</Label>
+                                <Input
+                                    id="demo-balance"
+                                    type="number"
+                                    value={balance}
+                                    onChange={(e) => setBalance(Number(e.target.value))}
+                                    placeholder="Ex: 50000"
+                                    className="bg-zinc-900/50 border-zinc-700/80"
+                                />
+                            </motion.div>
+                        )}
+                        </AnimatePresence>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={handleSave} disabled={isSaving} className="w-full bg-primary hover:bg-primary/90">
+                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                            <span className="ml-2">{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
+                        </Button>
+                    </DialogFooter>
+                </div>
+            </div>
+        </DialogContent>
+    );
+}
+
+function Header({ userProfile, userProfileRef }: { userProfile: UserProfile | null, userProfileRef: DocumentReference | null }) {
   const { auth } = useFirebase();
   const { user } = useUser();
   const router = useRouter();
+
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     await auth.signOut();
@@ -132,12 +233,12 @@ function Header() {
   };
 
   return (
-    <header className="absolute top-0 left-0 right-0 z-20 p-4 md:p-6 border-b border-white/10">
-      <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-        <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
-          CLICKIFY
-        </h1>
-        <Dialog>
+    <>
+      <header className="absolute top-0 left-0 right-0 z-20 p-4 md:p-6 border-b border-white/10">
+        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
+          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
+            CLICKIFY
+          </h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -157,15 +258,14 @@ function Header() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
-              <DialogTrigger asChild>
-                 <DropdownMenuItem
-                  onSelect={(e) => e.preventDefault()}
-                  className="cursor-pointer focus:bg-zinc-800 focus:text-white"
-                >
+               <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setIsInviteDialogOpen(true);}} className="cursor-pointer focus:bg-zinc-800 focus:text-white">
                   <Users className="mr-2 h-4 w-4" />
                   <span>Convite para Equipe</span>
                 </DropdownMenuItem>
-              </DialogTrigger>
+                <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setIsDemoDialogOpen(true);}} className="cursor-pointer focus:bg-zinc-800 focus:text-white">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  <span>Modo Demonstração</span>
+                </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem
                 onClick={handleSignOut}
@@ -176,10 +276,15 @@ function Header() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <InviteDialog />
-        </Dialog>
-      </div>
-    </header>
+        </div>
+      </header>
+      <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+        <InviteDialog />
+      </Dialog>
+      <Dialog open={isDemoDialogOpen} onOpenChange={setIsDemoDialogOpen}>
+        <DemoModeDialog userProfile={userProfile} userProfileRef={userProfileRef} />
+      </Dialog>
+    </>
   );
 }
 
@@ -208,6 +313,38 @@ function PainelContent() {
   }, [leads]);
 
     const chartData = useMemo(() => {
+    if (userProfile?.isDemoAccount) {
+        const now = new Date();
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const totalBalance = userProfile.demoBalance || 50000;
+        const dailyData = [];
+        let remainingBalance = totalBalance;
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            let dailyTotal = 0;
+            if (i < daysInMonth) {
+                if (Math.random() < 0.3) { // 30% chance of zero earnings
+                     dailyTotal = 0;
+                } else {
+                    let fluctuation = (Math.random() - 0.4) * 0.8; // Fluctuate
+                    let baseShare = remainingBalance / (daysInMonth - i + 1);
+                    dailyTotal = baseShare * (1 + fluctuation);
+                    dailyTotal = Math.max(0, dailyTotal);
+                    dailyTotal = Math.min(dailyTotal, remainingBalance);
+                    remainingBalance -= dailyTotal;
+                }
+            } else {
+                dailyTotal = remainingBalance; // Assign rest on the last day
+            }
+
+            dailyData.push({
+                day: format(new Date(now.getFullYear(), now.getMonth(), i), 'dd/MM'),
+                total: dailyTotal
+            });
+        }
+        return dailyData;
+    }
+
     if (!leads) return [];
 
     const now = new Date();
@@ -238,7 +375,7 @@ function PainelContent() {
     });
 
     return sortedData;
-}, [leads]);
+}, [leads, userProfile]);
 
 const chartConfig = {
     total: {
@@ -250,7 +387,7 @@ const chartConfig = {
 
   return (
     <>
-      <Header />
+      <Header userProfile={userProfile} userProfileRef={userProfileRef} />
       <main className="p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-black text-white relative overflow-hidden">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <div className="absolute -top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />

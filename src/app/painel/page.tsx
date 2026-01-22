@@ -16,21 +16,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Spotlight } from '@/components/ui/spotlight';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { collection, doc, Timestamp, type DocumentReference, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, Timestamp, type DocumentReference } from 'firebase/firestore';
 import { startOfDay, format, getDaysInMonth, eachDayOfInterval, endOfMonth } from 'date-fns';
 
 import {
@@ -66,10 +57,23 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
   const { auth } = useFirebase();
   const { user } = useUser();
   const router = useRouter();
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
 
   const handleSignOut = async () => {
     await auth.signOut();
     router.push('/login');
+  };
+  
+  const handleCopyInviteLink = () => {
+    const inviteLink = `${window.location.origin}/equipe`;
+    navigator.clipboard.writeText(inviteLink);
+    setCopied(true);
+    toast({
+        title: "Link Copiado!",
+        description: "O link de convite da equipe foi copiado.",
+    });
+    setTimeout(() => setCopied(false), 2500);
   };
 
   const getInitials = (name: string | null | undefined) => {
@@ -106,6 +110,14 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
                   <p className="text-xs leading-none text-zinc-400">{user?.email}</p>
                 </div>
               </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuItem
+                onClick={handleCopyInviteLink}
+                className="cursor-pointer focus:bg-zinc-800 focus:text-white"
+              >
+                {copied ? <Check className="mr-2 h-4 w-4" /> : <Users className="mr-2 h-4 w-4" />}
+                <span>{copied ? 'Copiado!' : 'Convidar Equipe'}</span>
+              </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem
                 onClick={handleSignOut}
@@ -358,7 +370,7 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                                         strokeDasharray: "3 3",
                                     }}
                                     content={<ChartTooltipContent
-                                        formatter={(value) => Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        formatter={(value) => Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         indicator="dot" 
                                         wrapperClassName="bg-background/80 backdrop-blur-lg border border-primary/20 rounded-lg shadow-lg"
                                         labelClassName="text-white font-bold"

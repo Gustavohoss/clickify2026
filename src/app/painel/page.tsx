@@ -38,6 +38,16 @@ import {
 } from "@/components/ui/chart"
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+
 
 // New Lead type for this page
 type Lead = {
@@ -58,20 +68,27 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
   const { user } = useUser();
   const router = useRouter();
   const { toast } = useToast();
+  
+  // State for the copy button in the dialog
   const [copied, setCopied] = useState(false);
+  
+  // Define inviteLink using useState to ensure it's client-side only
+  const [inviteLink, setInviteLink] = useState('');
+  useEffect(() => {
+    setInviteLink(`${window.location.origin}/equipe`);
+  }, []);
 
   const handleSignOut = async () => {
     await auth.signOut();
     router.push('/login');
   };
   
-  const handleCopyInviteLink = () => {
-    const inviteLink = `${window.location.origin}/equipe`;
+  const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(inviteLink);
     setCopied(true);
     toast({
         title: "Link Copiado!",
-        description: "O link de convite da equipe foi copiado.",
+        description: "O link de convite foi copiado para a área de transferência.",
     });
     setTimeout(() => setCopied(false), 2500);
   };
@@ -92,42 +109,69 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
           <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
             CLICKIFY
           </h1>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar className="h-10 w-10 border-2 border-white/10">
-                  <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
-                  <AvatarFallback className="bg-purple-800/60 text-white font-bold">
-                    {getInitials(user?.displayName)}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-black/80 backdrop-blur-lg border-zinc-800 text-white" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user?.displayName}</p>
-                  <p className="text-xs leading-none text-zinc-400">{user?.email}</p>
+          <Dialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10 border-2 border-white/10">
+                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                    <AvatarFallback className="bg-purple-800/60 text-white font-bold">
+                      {getInitials(user?.displayName)}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-black/80 backdrop-blur-lg border-zinc-800 text-white" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user?.displayName}</p>
+                    <p className="text-xs leading-none text-zinc-400">{user?.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-zinc-800" />
+                <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setCopied(false); // Reset copy state when opening dialog
+                    }}
+                    className="cursor-pointer focus:bg-zinc-800 focus:text-white"
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Convidar Equipe</span>
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DropdownMenuSeparator className="bg-zinc-800" />
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="cursor-pointer focus:bg-zinc-800 focus:text-white"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+             <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-800 text-white">
+                <DialogHeader>
+                    <DialogTitle>Link de Convite</DialogTitle>
+                    <DialogDescription>
+                        Compartilhe este link para convidar membros para sua equipe.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="flex items-center space-x-2">
+                    <Input
+                        id="invite-link"
+                        value={inviteLink}
+                        readOnly
+                        className="bg-zinc-800 border-zinc-700 flex-1"
+                    />
+                    <Button onClick={handleCopyToClipboard} size="sm" className="px-3 bg-purple-600 hover:bg-purple-700">
+                        <span className="sr-only">Copiar</span>
+                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
                 </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-zinc-800" />
-              <DropdownMenuItem
-                onClick={handleCopyInviteLink}
-                className="cursor-pointer focus:bg-zinc-800 focus:text-white"
-              >
-                {copied ? <Check className="mr-2 h-4 w-4" /> : <Users className="mr-2 h-4 w-4" />}
-                <span>{copied ? 'Copiado!' : 'Convidar Equipe'}</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-zinc-800" />
-              <DropdownMenuItem
-                onClick={handleSignOut}
-                className="cursor-pointer focus:bg-zinc-800 focus:text-white"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
     </>
@@ -169,29 +213,26 @@ function PainelContent() {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = endOfMonth(now);
     const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-    const formattedMonthDays = monthDays.map(d => format(d, 'dd/MM'));
-
+    
     let data: { day: string; total: number }[];
 
     if (userProfile?.isDemoAccount) {
-      const demoBalanceValue = Number(userProfile?.demoBalance) || 0;
-      const totalBalance = demoBalanceValue > 0 ? demoBalanceValue : 50000; // Default if 0
-      const daysInMonth = formattedMonthDays.length;
-      
-      const randomValues = Array.from({ length: daysInMonth }, () => Math.random());
-      const sumOfRandoms = randomValues.reduce((a, b) => a + b, 0);
-      
-      const normalizationFactor = sumOfRandoms > 0 ? totalBalance / sumOfRandoms : 0;
-      const normalizedValues = randomValues.map(v => v * normalizationFactor);
-      
-      data = formattedMonthDays.map((day, index) => ({
-          day: day,
-          total: normalizedValues[index] || 0,
-      }));
+        const demoBalanceValue = Number(userProfile?.demoBalance) || 0;
+        const totalBalance = demoBalanceValue > 0 ? demoBalanceValue : 50000;
+        const daysInMonth = monthDays.length;
 
+        const randomValues = Array.from({ length: daysInMonth }, () => Math.random());
+        const sumOfRandoms = randomValues.reduce((a, b) => a + b, 0);
+        const normalizationFactor = sumOfRandoms > 0 ? totalBalance / sumOfRandoms : 0;
+        const normalizedValues = randomValues.map(v => v * normalizationFactor);
+        
+        data = monthDays.map((day, index) => ({
+            day: format(day, 'dd/MM'),
+            total: normalizedValues[index] || 0,
+        }));
     } else {
         if (!leads) {
-             data = formattedMonthDays.map(day => ({ day, total: 0 }));
+            data = monthDays.map(day => ({ day: format(day, 'dd/MM'), total: 0 }));
         } else {
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
@@ -201,16 +242,19 @@ function PainelContent() {
                 
                 const leadDate = lead.createdAt.toDate();
                 if (leadDate.getMonth() === currentMonth && leadDate.getFullYear() === currentYear) {
-                    const day = format(leadDate, 'dd/MM');
-                    acc[day] = (acc[day] || 0) + (lead.valorContrato || 0);
+                    const dayKey = format(leadDate, 'dd/MM');
+                    acc[dayKey] = (acc[dayKey] || 0) + (lead.valorContrato || 0);
                 }
                 return acc;
             }, {} as Record<string, number>);
 
-            data = formattedMonthDays.map(day => ({
-                day,
-                total: dailyGains[day] || 0,
-            }));
+            data = monthDays.map(day => {
+                const dayKey = format(day, 'dd/MM');
+                return {
+                    day: dayKey,
+                    total: dailyGains[dayKey] || 0,
+                };
+            });
         }
     }
     const total = data.reduce((acc, curr) => acc + curr.total, 0);

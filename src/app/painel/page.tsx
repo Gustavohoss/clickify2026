@@ -17,7 +17,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Spotlight } from '@/components/ui/spotlight';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -48,6 +47,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 
 // New Lead type for this page
@@ -64,26 +64,43 @@ type UserProfile = {
   demoBalance?: number;
 };
 
-function Header({ userProfile }: { userProfile: UserProfile | null }) {
+const useTheme = () => {
+    const [theme, setThemeState] = useState("dark");
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        const savedTheme = localStorage.getItem("painel-theme") || "dark";
+        setThemeState(savedTheme);
+    }, []);
+
+    const toggleTheme = () => {
+        setThemeState((prevTheme) => {
+            const newTheme = prevTheme === "dark" ? "light" : "dark";
+            localStorage.setItem("painel-theme", newTheme);
+            return newTheme;
+        });
+    };
+
+    return { theme, toggleTheme, isMounted };
+};
+
+function Header({ userProfile, theme, toggleTheme, isMounted }: { 
+  userProfile: UserProfile | null,
+  theme: string,
+  toggleTheme: () => void,
+  isMounted: boolean
+}) {
   const { auth } = useFirebase();
   const { user } = useUser();
   const router = useRouter();
   const { toast } = useToast();
   
-  // State for the copy button in the dialog
   const [copied, setCopied] = useState(false);
-  
-  // Define inviteLink using useState to ensure it's client-side only
   const [inviteLink, setInviteLink] = useState('');
   useEffect(() => {
     setInviteLink(`${window.location.origin}/equipe`);
   }, []);
-
-  const { theme, setTheme, isMounted } = useTheme();
-
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
-  };
 
   const handleSignOut = async () => {
     await auth.signOut();
@@ -202,23 +219,25 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
   );
 }
 
-const useTheme = () => {
-    const [theme, setTheme] = useState("dark");
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-        setIsMounted(true);
-        const savedTheme = localStorage.getItem("theme") || "dark";
-        setTheme(savedTheme);
-    }, []);
-
-    return { theme, setTheme, isMounted };
-};
-
 function PainelContent() {
   const { user } = useUser();
   const { firestore } = useFirebase();
-  const { theme } = useTheme();
+  const { theme, toggleTheme, isMounted } = useTheme();
+
+  useEffect(() => {
+    if (isMounted) {
+      if (theme === 'light') {
+        document.documentElement.classList.add('painel-light-override');
+      } else {
+        document.documentElement.classList.remove('painel-light-override');
+      }
+    }
+    return () => {
+      if (isMounted) {
+          document.documentElement.classList.remove('painel-light-override');
+      }
+    }
+  }, [theme, isMounted]);
 
   const userProfileRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -311,31 +330,31 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
 
   return (
     <>
-      <Header userProfile={userProfile} />
+      <Header userProfile={userProfile} theme={theme} toggleTheme={toggleTheme} isMounted={isMounted} />
       <style jsx global>{`
-        .light {
-            --background: 0 0% 100%;
-            --foreground: 240 10% 3.9%;
-            --card: 0 0% 98%;
-            --card-foreground: 240 10% 3.9%;
-            --popover: 0 0% 100%;
-            --popover-foreground: 240 10% 3.9%;
-            --primary: 262 80% 58%;
-            --primary-foreground: 262 85% 96%;
-            --secondary: 240 4.8% 95.9%;
-            --secondary-foreground: 240 5.9% 10%;
-            --muted: 240 4.8% 95.9%;
-            --muted-foreground: 240 3.8% 46.1%;
-            --accent: 262 80% 58%;
-            --accent-foreground: 262 85% 96%;
-            --destructive: 0 62.8% 30.6%;
-            --destructive-foreground: 0 0% 98%;
-            --border: 240 5.9% 90%;
-            --input: 240 5.9% 90%;
-            --ring: 262 80% 58%;
+        html.painel-light-override {
+          --background: 0 0% 98%;
+          --foreground: 240 10% 3.9%;
+          --card: 0 0% 100%;
+          --card-foreground: 240 10% 3.9%;
+          --popover: 0 0% 100%;
+          --popover-foreground: 240 10% 3.9%;
+          --primary: 262 80% 58%;
+          --primary-foreground: 262 85% 96%;
+          --secondary: 240 4.8% 95.9%;
+          --secondary-foreground: 240 5.9% 10%;
+          --muted: 240 4.8% 95.9%;
+          --muted-foreground: 240 3.8% 46.1%;
+          --accent: 240 4.8% 95.9%;
+          --accent-foreground: 240 5.9% 10%;
+          --destructive: 0 84.2% 60.2%;
+          --destructive-foreground: 0 0% 98%;
+          --border: 240 5.9% 90%;
+          --input: 240 5.9% 90%;
+          --ring: 240 5.9% 10%;
         }
       `}</style>
-      <main className={cn("p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-background text-foreground relative overflow-hidden", theme)}>
+      <main className="p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-background text-foreground relative overflow-hidden">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <div className="absolute -top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
           <div className="absolute -bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
@@ -375,9 +394,13 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <Spotlight
-                  className="-top-20 -left-20 md:left-0 md:-top-10"
-                  fill={'hsl(var(--primary))'}
+              <GlowingEffect
+                spread={40}
+                glow={true}
+                disabled={false}
+                proximity={64}
+                inactiveZone={0.01}
+                borderWidth={3}
               />
               <div className="relative z-10 flex items-center justify-around gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
@@ -498,11 +521,15 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
               <Link href="/scraper" passHref>
                 <div
-                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 cursor-pointer"
+                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 cursor-pointer"
                 >
-                  <Spotlight
-                      className="-top-20 -left-20 md:left-0 md:-top-10"
-                      fill={'hsl(var(--primary))'}
+                  <GlowingEffect
+                    spread={40}
+                    glow={true}
+                    disabled={false}
+                    proximity={64}
+                    inactiveZone={0.01}
+                    borderWidth={3}
                   />
                   <div className="relative z-10">
                     <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
@@ -521,11 +548,15 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
               </Link>
                <Link href="/leads" passHref>
                 <div
-                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-orange-500/40 hover:shadow-2xl hover:shadow-orange-500/20 cursor-pointer"
+                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-orange-500/40 cursor-pointer"
                 >
-                   <Spotlight
-                      className="-top-20 -left-20 md:left-0 md:-top-10"
-                      fill={'#f97316'}
+                   <GlowingEffect
+                      spread={40}
+                      glow={true}
+                      disabled={false}
+                      proximity={64}
+                      inactiveZone={0.01}
+                      borderWidth={3}
                   />
                   <div className="relative z-10">
                     <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
@@ -544,11 +575,15 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
               </Link>
                <Link href="/contrato" passHref>
                 <div
-                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer"
+                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-blue-500/40 cursor-pointer"
                 >
-                   <Spotlight
-                      className="-top-20 -left-20 md:left-0 md:-top-10"
-                      fill={'#3b82f6'}
+                   <GlowingEffect
+                      spread={40}
+                      glow={true}
+                      disabled={false}
+                      proximity={64}
+                      inactiveZone={0.01}
+                      borderWidth={3}
                   />
                   <div className="relative z-10">
                     <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
@@ -567,11 +602,15 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
               </Link>
                <Link href="/abordagem" passHref>
                 <div
-                   className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-yellow-500/40 hover:shadow-2xl hover:shadow-yellow-500/20 cursor-pointer"
+                   className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-yellow-500/40 cursor-pointer"
                 >
-                   <Spotlight
-                      className="-top-20 -left-20 md:left-0 md:-top-10"
-                      fill={'#eab308'}
+                   <GlowingEffect
+                      spread={40}
+                      glow={true}
+                      disabled={false}
+                      proximity={64}
+                      inactiveZone={0.01}
+                      borderWidth={3}
                   />
                   <div className="relative z-10">
                     <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
@@ -589,14 +628,18 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                 </div>
               </Link>
             </div>
-             <div className="grid grid-cols-1 gap-6">
+             <div className="grid grid-cols-1 gap-6 pt-6">
                  <Link href="/prompt-builder" passHref>
                     <div
-                      className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/20 cursor-pointer"
+                      className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-indigo-500/40 cursor-pointer"
                     >
-                       <Spotlight
-                          className="-top-20 -left-20 md:left-0 md:-top-10"
-                          fill={'#6366f1'}
+                       <GlowingEffect
+                          spread={40}
+                          glow={true}
+                          disabled={false}
+                          proximity={64}
+                          inactiveZone={0.01}
+                          borderWidth={3}
                       />
                     <div className="relative z-10">
                         <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">

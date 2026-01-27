@@ -1,7 +1,7 @@
 
 'use client';
 
-import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2, Users, Copy, Check, Loader2 } from 'lucide-react';
+import { ArrowRight, FileText, LogOut, Briefcase, Search, Sparkles, Building2, Users, Copy, Check, Loader2, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import AuthGuard from '@/components/auth-guard';
@@ -78,6 +78,26 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
     setInviteLink(`${window.location.origin}/equipe`);
   }, []);
 
+  const [isMounted, setIsMounted] = useState(false);
+  const [theme, setTheme] = useState("dark");
+
+  useEffect(() => {
+    setIsMounted(true);
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    setTheme(savedTheme);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      document.documentElement.classList.toggle("dark", theme === "dark");
+      localStorage.setItem("theme", theme);
+    }
+  }, [theme, isMounted]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+  };
+
   const handleSignOut = async () => {
     await auth.signOut();
     router.push('/login');
@@ -109,69 +129,86 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
           <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 to-foreground/60">
             CLICKIFY
           </h1>
-          <Dialog>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10 border-2 border-border">
-                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
-                    <AvatarFallback className="bg-primary/20 text-primary font-bold">
-                      {getInitials(user?.displayName)}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-background/80 backdrop-blur-lg border-border text-foreground" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user?.displayName}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-border" />
-                <DialogTrigger asChild>
+          <div className="flex items-center gap-2">
+            {isMounted && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="text-foreground/70 hover:text-foreground"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            )}
+            <Dialog>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10 border-2 border-border">
+                      <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                      <AvatarFallback className="bg-primary/20 text-primary font-bold">
+                        {getInitials(user?.displayName)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-background/80 backdrop-blur-lg border-border text-foreground" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user?.displayName}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-border" />
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setCopied(false); // Reset copy state when opening dialog
+                      }}
+                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Convidar Equipe</span>
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DropdownMenuSeparator className="bg-border" />
                   <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setCopied(false); // Reset copy state when opening dialog
-                    }}
+                    onClick={handleSignOut}
                     className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
                   >
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>Convidar Equipe</span>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
                   </DropdownMenuItem>
-                </DialogTrigger>
-                <DropdownMenuSeparator className="bg-border" />
-                <DropdownMenuItem
-                  onClick={handleSignOut}
-                  className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-             <DialogContent className="sm:max-w-md bg-background border-border text-foreground">
-                <DialogHeader>
-                    <DialogTitle>Link de Convite</DialogTitle>
-                    <DialogDescription className="text-muted-foreground">
-                        Compartilhe este link para convidar membros para sua equipe.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="flex items-center space-x-2">
-                    <Input
-                        id="invite-link"
-                        value={inviteLink}
-                        readOnly
-                        className="bg-secondary border-border flex-1"
-                    />
-                    <Button onClick={handleCopyToClipboard} size="sm" className="px-3 bg-primary hover:bg-primary/90">
-                        <span className="sr-only">Copiar</span>
-                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
-                </div>
-            </DialogContent>
-          </Dialog>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DialogContent className="sm:max-w-md bg-background border-border text-foreground">
+                  <DialogHeader>
+                      <DialogTitle>Link de Convite</DialogTitle>
+                      <DialogDescription className="text-muted-foreground">
+                          Compartilhe este link para convidar membros para sua equipe.
+                      </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex items-center space-x-2">
+                      <Input
+                          id="invite-link"
+                          value={inviteLink}
+                          readOnly
+                          className="bg-secondary border-border flex-1"
+                      />
+                      <Button onClick={handleCopyToClipboard} size="sm" className="px-3 bg-primary hover:bg-primary/90">
+                          <span className="sr-only">Copiar</span>
+                          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                  </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </header>
     </>
@@ -182,16 +219,6 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
 function PainelContent() {
   const { user } = useUser();
   const { firestore } = useFirebase();
-
-  useEffect(() => {
-    // On mount, force light theme for this page
-    document.documentElement.classList.remove('dark');
-
-    // On unmount, restore dark theme for other pages
-    return () => {
-      document.documentElement.classList.add('dark');
-    };
-  }, []);
 
   const userProfileRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -284,29 +311,6 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
 
   return (
     <>
-      <style jsx global>{`
-        html:not(.dark) {
-            --background: 0 0% 100%;
-            --foreground: 240 10% 3.9%;
-            --card: 0 0% 100%;
-            --card-foreground: 240 10% 3.9%;
-            --popover: 0 0% 100%;
-            --popover-foreground: 240 10% 3.9%;
-            --primary: 262 80% 58%;
-            --primary-foreground: 355.7 100% 97.3%;
-            --secondary: 240 4.8% 95.9%;
-            --secondary-foreground: 240 5.9% 10%;
-            --muted: 240 4.8% 95.9%;
-            --muted-foreground: 240 3.8% 46.1%;
-            --accent: 240 4.8% 95.9%;
-            --accent-foreground: 240 5.9% 10%;
-            --destructive: 0 84.2% 60.2%;
-            --destructive-foreground: 0 0% 98%;
-            --border: 240 5.9% 90%;
-            --input: 240 5.9% 90%;
-            --ring: 240 5.9% 10%;
-        }
-      `}</style>
       <Header userProfile={userProfile} />
       <main className="p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-background text-foreground relative overflow-hidden">
         <div className="absolute inset-0 w-full h-full overflow-hidden">

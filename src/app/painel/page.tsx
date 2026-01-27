@@ -104,57 +104,57 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
 
   return (
     <>
-      <header className="absolute top-0 left-0 right-0 z-20 p-4 md:p-6 border-b border-white/10">
+      <header className="absolute top-0 left-0 right-0 z-20 p-4 md:p-6 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60">
+          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 to-foreground/60">
             CLICKIFY
           </h1>
           <Dialog>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10 border-2 border-white/10">
+                  <Avatar className="h-10 w-10 border-2 border-border">
                     <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
-                    <AvatarFallback className="bg-purple-800/60 text-white font-bold">
+                    <AvatarFallback className="bg-primary/20 text-primary font-bold">
                       {getInitials(user?.displayName)}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-black/80 backdrop-blur-lg border-zinc-800 text-white" align="end" forceMount>
+              <DropdownMenuContent className="w-56 bg-background/80 backdrop-blur-lg border-border text-foreground" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">{user?.displayName}</p>
-                    <p className="text-xs leading-none text-zinc-400">{user?.email}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-zinc-800" />
+                <DropdownMenuSeparator className="bg-border" />
                 <DialogTrigger asChild>
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
                       setCopied(false); // Reset copy state when opening dialog
                     }}
-                    className="cursor-pointer focus:bg-zinc-800 focus:text-white"
+                    className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
                   >
                     <Users className="mr-2 h-4 w-4" />
                     <span>Convidar Equipe</span>
                   </DropdownMenuItem>
                 </DialogTrigger>
-                <DropdownMenuSeparator className="bg-zinc-800" />
+                <DropdownMenuSeparator className="bg-border" />
                 <DropdownMenuItem
                   onClick={handleSignOut}
-                  className="cursor-pointer focus:bg-zinc-800 focus:text-white"
+                  className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sair</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-             <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-800 text-white">
+             <DialogContent className="sm:max-w-md bg-background border-border text-foreground">
                 <DialogHeader>
                     <DialogTitle>Link de Convite</DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-muted-foreground">
                         Compartilhe este link para convidar membros para sua equipe.
                     </DialogDescription>
                 </DialogHeader>
@@ -163,9 +163,9 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
                         id="invite-link"
                         value={inviteLink}
                         readOnly
-                        className="bg-zinc-800 border-zinc-700 flex-1"
+                        className="bg-secondary border-border flex-1"
                     />
-                    <Button onClick={handleCopyToClipboard} size="sm" className="px-3 bg-purple-600 hover:bg-purple-700">
+                    <Button onClick={handleCopyToClipboard} size="sm" className="px-3 bg-primary hover:bg-primary/90">
                         <span className="sr-only">Copiar</span>
                         {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
@@ -182,6 +182,16 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
 function PainelContent() {
   const { user } = useUser();
   const { firestore } = useFirebase();
+
+  useEffect(() => {
+    // On mount, force light theme for this page
+    document.documentElement.classList.remove('dark');
+
+    // On unmount, restore dark theme for other pages
+    return () => {
+      document.documentElement.classList.add('dark');
+    };
+  }, []);
 
   const userProfileRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -274,11 +284,34 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
 
   return (
     <>
+      <style jsx global>{`
+        html:not(.dark) {
+            --background: 0 0% 100%;
+            --foreground: 240 10% 3.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 240 10% 3.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 240 10% 3.9%;
+            --primary: 262 80% 58%;
+            --primary-foreground: 355.7 100% 97.3%;
+            --secondary: 240 4.8% 95.9%;
+            --secondary-foreground: 240 5.9% 10%;
+            --muted: 240 4.8% 95.9%;
+            --muted-foreground: 240 3.8% 46.1%;
+            --accent: 240 4.8% 95.9%;
+            --accent-foreground: 240 5.9% 10%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 5.9% 90%;
+            --input: 240 5.9% 90%;
+            --ring: 240 5.9% 10%;
+        }
+      `}</style>
       <Header userProfile={userProfile} />
-      <main className="p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-black text-white relative overflow-hidden">
+      <main className="p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-background text-foreground relative overflow-hidden">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <div className="absolute -top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
-          <div className="absolute -bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
+          <div className="absolute -top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
+          <div className="absolute -bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
         </div>
 
         <div className="w-full max-w-5xl mx-auto relative z-10">
@@ -295,12 +328,12 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="inline-block"
               >
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/60 pb-2">
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 to-foreground/60 pb-2">
                   Bem-vindo, {user?.displayName?.split(' ')[0]}
                 </h1>
               </motion.div>
               <motion.p
-                className="text-lg text-white/50 max-w-2xl"
+                className="text-lg text-muted-foreground max-w-2xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -310,36 +343,36 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
             </div>
             
             <motion.div 
-              className="group relative p-3 rounded-2xl overflow-hidden bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 cursor-pointer"
+              className="group relative p-3 rounded-2xl overflow-hidden bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 cursor-pointer"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
               <Spotlight
                   className="-top-20 -left-20 md:left-0 md:-top-10"
-                  fill={'#a855f7'}
+                  fill={'hsl(var(--primary))'}
               />
-              <div className="relative z-10 flex items-center justify-around gap-6 text-sm text-zinc-400">
+              <div className="relative z-10 flex items-center justify-around gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <span className="text-base">🔥</span>
                   {areLeadsLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <span><span className="font-bold text-white">{leadsToday}</span> Leads capturados hoje</span>
+                    <span><span className="font-bold text-foreground">{leadsToday}</span> Leads capturados hoje</span>
                   )}
                 </div>
-                <div className="h-4 w-px bg-zinc-700"></div>
+                <div className="h-4 w-px bg-border"></div>
                 <div className="flex items-center gap-2">
                   <span className="text-base">⚡</span>
-                  <span>Último uso: <span className="font-bold text-white">Scraper</span> (há 2h)</span>
+                  <span>Último uso: <span className="font-bold text-foreground">Scraper</span> (há 2h)</span>
                 </div>
-                <div className="h-4 w-px bg-zinc-700"></div>
+                <div className="h-4 w-px bg-border"></div>
                 <div className="flex items-center gap-2">
                   <span className="text-base">💎</span>
                    {isProfileLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <span>Plano <span className="font-bold text-purple-400">{userProfile?.plan || '...'}</span> Ativo</span>
+                    <span>Plano <span className="font-bold text-primary">{userProfile?.plan || '...'}</span> Ativo</span>
                   )}
                 </div>
               </div>
@@ -350,15 +383,15 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-               <Card className="bg-background/50 border-primary/20">
+               <Card className="bg-card border-primary/20">
                   <CardHeader className="flex flex-row items-start justify-between">
                       <div>
-                          <CardTitle className="text-white">Ganhos do Mês</CardTitle>
-                          <CardDescription className="text-white/50">Soma dos contratos fechados neste mês.</CardDescription>
+                          <CardTitle className="text-foreground">Ganhos do Mês</CardTitle>
+                          <CardDescription className="text-muted-foreground">Soma dos contratos fechados neste mês.</CardDescription>
                       </div>
                       <div className="text-right">
-                          <CardDescription className="text-white/50">Ganhos Totais</CardDescription>
-                          <p className="text-2xl font-bold text-white">
+                          <CardDescription className="text-muted-foreground">Ganhos Totais</CardDescription>
+                          <p className="text-2xl font-bold text-foreground">
                             {isLoadingChart ? (
                               <Loader2 className="w-6 h-6 animate-spin ml-auto" />
                             ) : (
@@ -390,10 +423,10 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={8}
-                                    stroke="hsl(var(--foreground) / 0.5)"
+                                    stroke="hsl(var(--muted-foreground) / 0.8)"
                                 />
                                  <YAxis
-                                    stroke="hsl(var(--foreground) / 0.5)"
+                                    stroke="hsl(var(--muted-foreground) / 0.8)"
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={10}
@@ -417,7 +450,7 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
                                         formatter={(value) => Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         indicator="dot" 
                                         wrapperClassName="bg-background/80 backdrop-blur-lg border border-primary/20 rounded-lg shadow-lg"
-                                        labelClassName="text-white font-bold"
+                                        labelClassName="text-foreground font-bold"
                                     />}
                                 />
                                 <Line
@@ -438,119 +471,119 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
               <Link href="/scraper" passHref>
                 <div
-                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 cursor-pointer"
+                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 cursor-pointer"
                 >
                   <Spotlight
                       className="-top-20 -left-20 md:left-0 md:-top-10"
-                      fill={'#a855f7'}
+                      fill={'hsl(var(--primary))'}
                   />
                   <div className="relative z-10">
-                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
                       Capitar Lead
                     </h2>
-                    <p className="text-white/40 mt-2">
+                    <p className="text-muted-foreground mt-2">
                       Uma ferramenta de varredura para encontrar informações de estabelecimentos.
                     </p>
                   </div>
-                  <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                  <div className="mt-6 flex items-center text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                     Acessar Ferramenta
                     <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <Search className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-primary/10 transition-colors duration-500"/>
+                  <Search className="absolute -right-8 -bottom-8 h-32 w-32 text-foreground/5 group-hover:text-primary/10 transition-colors duration-500"/>
                 </div>
               </Link>
                <Link href="/leads" passHref>
                 <div
-                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-orange-500/40 hover:shadow-2xl hover:shadow-orange-500/20 cursor-pointer"
+                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-orange-500/40 hover:shadow-2xl hover:shadow-orange-500/20 cursor-pointer"
                 >
                    <Spotlight
                       className="-top-20 -left-20 md:left-0 md:-top-10"
                       fill={'#f97316'}
                   />
                   <div className="relative z-10">
-                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
                       Leads
                     </h2>
-                    <p className="text-white/40 mt-2">
+                    <p className="text-muted-foreground mt-2">
                       Gerencie e anote os contatos que você salvou.
                     </p>
                   </div>
-                  <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                  <div className="mt-6 flex items-center text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                     Acessar Ferramenta
                     <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <Briefcase className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-orange-500/10 transition-colors duration-500"/>
+                  <Briefcase className="absolute -right-8 -bottom-8 h-32 w-32 text-foreground/5 group-hover:text-orange-500/10 transition-colors duration-500"/>
                 </div>
               </Link>
                <Link href="/contrato" passHref>
                 <div
-                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer"
+                  className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer"
                 >
                    <Spotlight
                       className="-top-20 -left-20 md:left-0 md:-top-10"
                       fill={'#3b82f6'}
                   />
                   <div className="relative z-10">
-                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
                       Gerar Contrato
                     </h2>
-                    <p className="text-white/40 mt-2">
+                    <p className="text-muted-foreground mt-2">
                       Crie contratos profissionais para seus clientes em minutos.
                     </p>
                   </div>
-                  <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                  <div className="mt-6 flex items-center text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                     Acessar Ferramenta
                     <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <FileText className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-blue-500/10 transition-colors duration-500"/>
+                  <FileText className="absolute -right-8 -bottom-8 h-32 w-32 text-foreground/5 group-hover:text-blue-500/10 transition-colors duration-500"/>
                 </div>
               </Link>
                <Link href="/abordagem" passHref>
                 <div
-                   className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-yellow-500/40 hover:shadow-2xl hover:shadow-yellow-500/20 cursor-pointer"
+                   className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-yellow-500/40 hover:shadow-2xl hover:shadow-yellow-500/20 cursor-pointer"
                 >
                    <Spotlight
                       className="-top-20 -left-20 md:left-0 md:-top-10"
                       fill={'#eab308'}
                   />
                   <div className="relative z-10">
-                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
                       Abordagem de Empresas
                     </h2>
-                    <p className="text-white/40 mt-2">
+                    <p className="text-muted-foreground mt-2">
                       Modelos de mensagens e scripts para prospecção.
                     </p>
                   </div>
-                  <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                  <div className="mt-6 flex items-center text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                     Acessar Ferramenta
                     <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <Building2 className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-yellow-500/10 transition-colors duration-500"/>
+                  <Building2 className="absolute -right-8 -bottom-8 h-32 w-32 text-foreground/5 group-hover:text-yellow-500/10 transition-colors duration-500"/>
                 </div>
               </Link>
             </div>
              <div className="grid grid-cols-1 gap-6">
                  <Link href="/prompt-builder" passHref>
                     <div
-                      className="group relative p-6 rounded-2xl overflow-hidden h-full bg-background/50 border border-primary/20 transition-all duration-300 ease-in-out hover:border-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/20 cursor-pointer"
+                      className="group relative p-6 rounded-2xl overflow-hidden h-full bg-card border border-primary/20 transition-all duration-300 ease-in-out hover:border-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/20 cursor-pointer"
                     >
                        <Spotlight
                           className="-top-20 -left-20 md:left-0 md:-top-10"
                           fill={'#6366f1'}
                       />
                     <div className="relative z-10">
-                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
                         Cria SAAS
                         </h2>
-                        <p className="text-white/40 mt-2">
+                        <p className="text-muted-foreground mt-2">
                         Crie a base do seu SAAS ou pegue um ja pronto!
                         </p>
                     </div>
-                    <div className="mt-6 flex items-center text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                    <div className="mt-6 flex items-center text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                         Acessar Ferramenta
                         <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                     </div>
-                    <Sparkles className="absolute -right-8 -bottom-8 h-32 w-32 text-white/5 group-hover:text-indigo-500/10 transition-colors duration-500"/>
+                    <Sparkles className="absolute -right-8 -bottom-8 h-32 w-32 text-foreground/5 group-hover:text-indigo-500/10 transition-colors duration-500"/>
                     </div>
                 </Link>
             </div>

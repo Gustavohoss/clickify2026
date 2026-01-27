@@ -47,6 +47,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 
 // New Lead type for this page
@@ -78,21 +79,7 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
     setInviteLink(`${window.location.origin}/equipe`);
   }, []);
 
-  const [isMounted, setIsMounted] = useState(false);
-  const [theme, setTheme] = useState("dark");
-
-  useEffect(() => {
-    setIsMounted(true);
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    setTheme(savedTheme);
-  }, []);
-
-  useEffect(() => {
-    if (isMounted) {
-      document.documentElement.classList.toggle("dark", theme === "dark");
-      localStorage.setItem("theme", theme);
-    }
-  }, [theme, isMounted]);
+  const { theme, setTheme, isMounted } = useTheme();
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
@@ -215,10 +202,23 @@ function Header({ userProfile }: { userProfile: UserProfile | null }) {
   );
 }
 
+const useTheme = () => {
+    const [theme, setTheme] = useState("dark");
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        setTheme(savedTheme);
+    }, []);
+
+    return { theme, setTheme, isMounted };
+};
 
 function PainelContent() {
   const { user } = useUser();
   const { firestore } = useFirebase();
+  const { theme } = useTheme();
 
   const userProfileRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -312,7 +312,30 @@ const isLoadingChart = isProfileLoading || (!userProfile?.isDemoAccount && areLe
   return (
     <>
       <Header userProfile={userProfile} />
-      <main className="p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-background text-foreground relative overflow-hidden">
+      <style jsx global>{`
+        .light {
+            --background: 0 0% 100%;
+            --foreground: 240 10% 3.9%;
+            --card: 0 0% 98%;
+            --card-foreground: 240 10% 3.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 240 10% 3.9%;
+            --primary: 262 80% 58%;
+            --primary-foreground: 262 85% 96%;
+            --secondary: 240 4.8% 95.9%;
+            --secondary-foreground: 240 5.9% 10%;
+            --muted: 240 4.8% 95.9%;
+            --muted-foreground: 240 3.8% 46.1%;
+            --accent: 262 80% 58%;
+            --accent-foreground: 262 85% 96%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 5.9% 90%;
+            --input: 240 5.9% 90%;
+            --ring: 262 80% 58%;
+        }
+      `}</style>
+      <main className={cn("p-4 md:p-10 pt-28 md:pt-32 min-h-screen bg-background text-foreground relative overflow-hidden", theme)}>
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <div className="absolute -top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
           <div className="absolute -bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
